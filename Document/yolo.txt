@@ -1,0 +1,24 @@
+Cài đặt yolo:
+pip install ultralytics
+
+Để sử dụng được yolo với GPU thì cần cho máy tính tìm ra được CUDA, nên cần tải Torch GPU, phiên bản phù hợp hiện nay là 11.7
+Đầu tiên cần gỡ cài đặt torch:
+python -m pip uninstall torch
+python -m pip cache purge
+
+Sau đó cài đặt pytorch với cuda117:
+python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+
+Hoặc lên trang chủ torch cài đặt với các phiên bản cuda 11.8, 12.1, 12.4, ...
+
+Nếu Yolo gặp lỗi không tương thích với numpy > 2.0 thì cần cài bản thấp hơn:
+pip install "numpy<2.0"
+
+Lỗi : A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.1.2 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.

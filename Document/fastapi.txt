@@ -1,0 +1,3 @@
+Sử dụng FastAPI để tạo api trên ngôn ngữ Python
+Câu lệnh tải fastapi:
+pip install "fastapi[standard]"

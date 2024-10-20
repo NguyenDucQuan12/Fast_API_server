@@ -1,0 +1,5 @@
+Môi trường ảo của server là:
+python 3.10.9 để phù hợp với paddlepaddle-gpu phiên bản 2.4.2.post117: là phiên bản gpu chỉ chạy được trên cuda 11.7
+
+Chạy lệnh sau:
+python -m venv .server_venv --prompt="Smart Parking Server"

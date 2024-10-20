@@ -1,0 +1,1 @@
+File avatar phải lưu ở định dạng png thì mới hợp lệ

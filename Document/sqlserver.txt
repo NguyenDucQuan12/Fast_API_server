@@ -1,0 +1,10 @@
+Để sử dụng sqlserver thì cần tải driver `ODBC Driver for SQL Server` và cần lưu ý phiên bản driver.
+Ví dụ: ODBC Driver 18 for SQL Server
+
+Sau đó tải thêm thư viện kết nối:
+pip install pyodbc
+
+và tạo câu lệnh kết nối với sqlserver bằng sqlalchemy:
+pip install SQLAlchemy
+
+Câu lệnh kết nối như trong file database.py ở thư mục db

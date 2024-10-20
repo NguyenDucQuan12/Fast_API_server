@@ -1,0 +1,15 @@
+# Ignore zip files
+*.rar
+
+# Ignore docx files
+*.docx
+
+# Ignore virtual environment
+.server_venv/
+
+# Ignore combie python
+__pycache__/
+*.pyc
+
+# Ignore upload file
+upload/
