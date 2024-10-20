@@ -1,0 +1,6 @@
+{
+    "latest_version": "1.0.0",
+    "download_url": "http://192.168.0.100:8000/update/download/1.0.0",
+    "release_notes": "Cập nhật tính năng mới và sửa lỗi.",
+    "checksum": "1c35f3067d9b872e42bc84075720a56db78e354d38e6a5181ef159894254364f"
+}
