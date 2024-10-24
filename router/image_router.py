@@ -45,7 +45,7 @@ def get_image(image_path: str):
     # Kiểm tra xem file có tồn tại không
     if os.path.isfile(image_path):
         # Trả về file hình ảnh
-        return FileResponse(image_path, media_type="image/jpeg")
+        return FileResponse(image_path, media_type="image/png")
     else:
         # Nếu không tìm thấy file, trả về lỗi 404
         return Response(status_code=404, content="Image not found")

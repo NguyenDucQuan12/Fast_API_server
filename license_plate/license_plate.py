@@ -139,6 +139,7 @@ def predict(image, image2, save=True):
     is_license_plate= False   #default
     license_plate = "Không thấy biển số"   #default
     img_path = "None"    #default
+    license_plate_crop = cv2.imread("assets\\image\\img_src\\error_cross.png")
 
     image = check_image(image=image)
     image2 = check_image(image=image2)
@@ -180,6 +181,8 @@ def predict(image, image2, save=True):
             
             # Sau khi xử lý xong hình ảnh, giải phóng bộ nhớ của hình ảnh
             del license_plate_crop
+            del image
+            del image2
             cv2.destroyAllWindows()
 
             return {
@@ -188,7 +191,14 @@ def predict(image, image2, save=True):
                 "license_plate_path": license_plate_path,
                 "face_path": face_path
             }
-        
+    
+    # lưu hình ảnh biển số vào thư mục
+    if save:
+        license_plate_path, face_path = save_image_license_plate(license_plate_VN="not_detect_license_plate",
+                                                                license_plate_crop= license_plate_crop,
+                                                                image_license_plate= image,
+                                                                image_face= image2)
+
     # Giải phóng bộ nhớ của hình ảnh đầu vào
     # Nếu không phát hiện biển số
     del image

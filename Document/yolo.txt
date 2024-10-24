@@ -6,7 +6,7 @@ pip install ultralytics
 python -m pip uninstall torch
 python -m pip cache purge
 
-Sau đó cài đặt pytorch với cuda117:
+Sau đó cài đặt pytorch với cuda117 (Cuda này chỉ cài được trên python 3.10):
 python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
 
 Hoặc lên trang chủ torch cài đặt với các phiên bản cuda 11.8, 12.1, 12.4, ...

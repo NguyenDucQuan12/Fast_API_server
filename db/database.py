@@ -9,22 +9,26 @@ from sqlalchemy.engine import URL
 """
 
 # connection_url = "sqlite:///./fastapi-practice.db" # Dùng để tạo DB sql lite
-MY_HOSTNAME = socket.gethostname() # Tên laptop
-MY_IP_ADDR = socket.gethostbyname(MY_HOSTNAME) # Địa chỉ IPV4
+# Lấy địa chỉ IP của máy chủ bằng socket
+MY_HOSTNAME = socket.gethostname()
+MY_IP_ADDR = socket.gethostbyname(MY_HOSTNAME)
 
-# Dùng để tạo DB SQL Server # pip install pyodbc
+# Cấu trúc chuỗi kết nối đến SQL Server
+# pip install pyodbc
 connection_url = URL.create(
     "mssql+pyodbc",
-    username="sa",
-    password="123456789",
-    host=MY_IP_ADDR, #172.31.99.130  #192.168.0.102
-    port=1433,
-    database="Smart_Parking_Server",
+    username="sa", # Tên đăng nhập 
+    password="123456789", # mật khẩu đăng nhập
+    host=MY_IP_ADDR, #Địa chỉ IP của máy tính lấy được
+    port=1433, # cổng kết nối khi mở kết nối SQL server, xem them wor video youtube của bản thân
+    database="Smart_Parking_Server", # Tên của database cần truy cập
     query={
-        "driver": "ODBC Driver 18 for SQL Server",
-        "TrustServerCertificate": "yes"
+        "driver": "ODBC Driver 18 for SQL Server", # Phiên bản driver của ODBC đã tải về từ microsoft
+        "TrustServerCertificate": "yes"  
     },
 )
+
+# Kết nối đến SQL Server
 engine = create_engine(
     connection_url
 )
@@ -37,7 +41,8 @@ SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bi
 # Khai báo cơ sở dữ liệu với SQLAlchemy
 Base = declarative_base()
 
-# Hàm lấy session cho mỗi request (phải nhớ đóng session sau khi sử dụng)
+# Hàm lấy session cho mỗi request, khi gọi các lệnh đến Database thì cần gọi hàm này để mở kết nối đến Database
+# Hàm này sẽ tự động đóng kết nối sau khi sử dụng xong
 def get_db():
     db = SessionLocal()
     try:
