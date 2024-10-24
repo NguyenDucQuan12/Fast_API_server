@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 from datetime import datetime
 
 """
@@ -35,12 +34,9 @@ class EmployeeDisplay(BaseModel):
     - **id code**: Mã nhân viên  
     - **username**: Họ tên nhân viên  
     - **avatar**: Ảnh đại diện của nhân viên
-    - **vehicle**: Phương tiện di chuyển  
+    - **id_vehicle**: Phương tiện di chuyển  
     - **email**: Email của nhân viên  
-    - **phone_number**: SĐT của nhân viên  
     - **section**: Bộ phận của nhân viên  
-    - **permission**: Quyền hạn  
-    - **other**: các cột được bổ sung thông tin sau này  
     -  **Config**: cho phép tự động chuyển đổi dữ liệu type: Database quay trở về kiểu mà ta đã khai báo (str)
     """
     id_code_employee: int
@@ -55,13 +51,13 @@ class EmployeeDisplay(BaseModel):
 class ImageBase(BaseModel):
     """
     Class này chứa thông tin về hình ảnh khi có người ra vào nhà xe khi tạo dữ liệu lên DB  
-    - **in_out**: Vào hay ra nhà xe  
-    - **time**: Thời gian vào/ra  
-    - **license_image_path**: Đường dẫn hình ảnh biển số  
-    - **background_image_path**: Đường dẫn hình ảnh toàn cảnh  
-    - **face_image_path**: Đường dẫn hình ảnh khuồn mặt người lái  
-    - **location**: vị trí  
-    - **other**: thông tin thêm
+    - **id_employee**: Mã nhân viên của người ra vào nhà xe
+    - **in_out**: Tràn thái vào hay ra nhà xe  
+    - **time in **: Thời gian vào  
+    - **license_image_path_in**: Đường dẫn hình ảnh biển số vào  
+    - **background_image_path_in**: Đường dẫn hình ảnh toàn cảnh lúc vào  
+    - **face_image_path_in**: Đường dẫn hình ảnh khuồn mặt người lái lúc vào  
+    - **location_in**: vị trí khi vòa là làn nào  
     """
     id_employee: int
     in_out : str
@@ -76,18 +72,16 @@ class ImageBase(BaseModel):
     face_image_path_out : str
     location_out : str
 
-
 class ImageDisplay(BaseModel):
     """
-    Class này chứa thông tin hình ảnh ra vào nhà xe sẽ được hiển thị khi truy vấn
-    Hiển thị trong ImageDisplay  
+    Class này chứa thông tin hình ảnh ra vào nhà xe sẽ được trả về khi truy vấn api  
+    - **id_employee**: Mã nhân viên
     - **in_out**: Ra/vào nhà xe  
-    - **time**: Thời gian ra/vào  
-    - **license_image_path**: Biển số xe lúc vào  
-    - **background_image_path**: Hình ảnh toàn cảnh  
-    - **face_image_path**: Hình ảnh khuôn mặt  
-    - **employee**: Nhân viên đã đăng ký phương tiện  
-    - **vehicle**: Thông tin phương tiện  
+    - **time_in**: Thời gian vào  
+    - **license_image_path_in**: Biển số xe lúc vào  
+    - **background_image_path_in**: Hình ảnh toàn cảnh lúc vào  
+    - **face_image_path_in**: Hình ảnh khuôn mặt lúc vào  
+    - **location_in**: Vị trí làn vào  
     """
     id_employee: int
     in_out : str
@@ -111,8 +105,8 @@ class VehicleBase(BaseModel):
     - **vehicle_name**: Tên phương tiện  
     - **model**: Phiên bản  
     - **color**: Màu sắc phương tiện  
-    - **picture_vehicle**: Hình ảnh phương tiện   
-    - **other**: các cột được bổ sung thông tin sau này  
+    - **license_plate**: Biển số xe
+    - **picture_vehicle**: Hình ảnh phương tiện  
     """
     id_employee: int
     vehicle_name: str
@@ -123,15 +117,13 @@ class VehicleBase(BaseModel):
 
 class VehicleDisplay(BaseModel):
     """
-    Class này chứa thông tin về phương tiện sẽ được hiển thị khi truy vấn
-    Hiển thị trong VehicleDisplay
+    Class này chứa thông tin về phương tiện sẽ được hiển thị khi truy vấn api
+    - **id_employee**: MÃ nhân viên đăng ký phương tiện này  
     - **vehicle_name**: Tên phương tiện  
     - **model**: Phiên bản  
     - **color**: Màu sắc phương tiện  
-    - **picture_vehicle**: Hình ảnh phương tiện   
-    - **employee**: Thông tin nhân viên đăng ký xe   
-    - **image**: Hình ảnh phương tiện ra/vào nhà xe   
-    - **other**: các cột được bổ sung thông tin sau này 
+    - **license_plate**: Biển số xe  
+    - **picture_vehicle**: Hình ảnh phương tiện  
     """
     id_employee: int
     vehicle_name: str

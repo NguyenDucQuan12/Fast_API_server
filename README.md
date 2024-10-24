@@ -11,8 +11,8 @@
 [II. Cách sử dụng](#ii-cách-sử-dụng)
 - [1. Kết nối với CSDL (SQL Server)](#1-Kết-nối-với-CSDL-SQL-Server)
   - [1. Tạo chuỗi kết nối](#1-tạo-chuỗi-kết-nối)
-  - [2. Đoạn văn - Paragraph](#2-đoạn-văn---paragraph)
-  - [3. Chữ in nghiêng - Italic](#3-chữ-in-nghiêng---italic)
+  - [2. Tạo bảng dữ liệu](#2-tạo-bảng-dữ-liệu)
+  - [3. Thêm sửa xóa dữ liệu trong CSDL ](#3-thêm-sửa-xóa-dữ-liệu-trong-CSDL)
   - [4. Chữ in đậm - Bold](#4-chữ-in-đậm---bold)
   - [5. In đậm và in nghiêng](#5-in-đậm-và-in-nghiêng)
   - [6. Chữ gạch giữa - Strikethrough](#6-chữ-gạch-giữa---strikethrough)
@@ -191,3 +191,67 @@ from sqlalchemy import Column, Integer, String, DateTime
 
 
 Xem ví dụ cụ thể [tại đây](db/model.py)  
+
+### 3. Thêm sửa xóa dữ liệu trong CSDL  
+
+Sau khi có bảng dữ liệu trong `SQL Server` thì ta sẽ tiến hành `Thao tác` với những trường dữ liệu này. Đầu tiên ta cần định nghĩa các lược đồ của bảng dữ liệu trong `SQL Server`. Ví dụ với bảng `employee` mà tôi đã tạo trước đó. Để có thể thao tác với dữ liệu trong `SQL Server` thì ta cần lớp `BaseModel` từ thư viện `pydantic`.  
+
+```python
+class EmployeeBase(BaseModel):
+    """
+    Class này chứa thông tin cần được cung cấp để tạo một nhân viên mới
+    - **id code**: Mã nhân viên  
+    - **id card**: Mã thẻ từ của nhân viên  
+    - **username**: Họ tên nhân viên  
+    - **email**: Email của nhân viên  
+    - **phone_number**: SĐT của nhân viên  
+    - **section**: Bộ phận của nhân viên  
+    - **permission**: Quyền hạn  
+    - **other**: các cột được bổ sung thông tin sau này, khi nào thêm thông tin thì thêm vào  
+    """
+    id_code_employee: int
+    id_card: int
+    id_vehicle: int
+    username: str
+    email: str
+    phone_number: str
+    section: str
+    permission: str
+```
+Class này sẽ chứa những thông tin mà ta cần người dùng cung cấp cho chúng ta, bạn có thể nhận thấy là nó đang thiếu 2 mục `avatar` và `other`.  
+
+> avatar là đường dẫn hình ảnh khi người dùng tải lên, việc người dùng vừa tải hình ảnh lên, vừa cung cấp các thông tin dạng json vào cùng 1 lúc sẽ gây ra lỗi khi gọi api. Vì vậy class này chỉ chứa các thông tin của người dùng, còn hình ảnh thì sau khi người dùng đã tạo hết thông tin thì sẽ có 1 api cho người dùng tải hình ảnh lên riêng. Vì vậy ở đây sẽ không có mục avatar.
+> Tương tự với other thì để dành cho sau này nên bây giờ nó chưa cần người dùng cung cấp thông tin nên sẽ không có vào.
+
+Sau khi có thông tin từ người dùng, ta cũng cần phản hồi lại cho người dùng 1 thông tin. Ví dụ kkhi bạn cung cấp thông tin để tạo tài khoản, tạo xong thì sẽ có một thông báo trả về với nội dung: `Bạn đã tạo thành công tài khoản với tên người dùng: xxx`. Người dùng cung cấp rất nhiều thông tin, nhưng chúng ta chỉ trả về đơn giản chỉ là những thông tin cần thiết. Không nhất thiết phải trả về đầy đủ thông tin và những thông tin có tính cá nhân `(email, sđt, mật khẩu)` thì tuyệt đối không trả về bừa bãi.  
+Vì vậy ta cũng tạo một class để hiển thị những thông tin trả về:  
+
+```python
+class EmployeeDisplay(BaseModel):
+    """
+    Trả về thông tin người dùng theo ý muốn, không trả về những thông tin quan trọng như password đã hash
+    Lưu ý tên của các trường thông tin trả về phải giống nhau, nếu không gặp lỗi
+    - **id code**: Mã nhân viên  
+    - **username**: Họ tên nhân viên  
+    - **avatar**: Ảnh đại diện của nhân viên
+    - **id_vehicle**: Phương tiện di chuyển  
+    - **email**: Email của nhân viên  
+    - **section**: Bộ phận của nhân viên  
+    -  **Config**: cho phép tự động chuyển đổi dữ liệu type: Database quay trở về kiểu mà ta đã khai báo (str)
+    """
+    id_code_employee: int
+    username: str
+    avatar: str
+    email:str
+    section: str
+    id_vehicle: int
+    class Config():
+        from_attributes  = True
+```
+##
+Ta cần khai báo `Config` để khi ta lấy thông tin từ `SQL Server` trả về dưới dạng `string`, `int` không gặp lỗi. Nếu không sẽ gặp xung đột khi cố gắng chuyển đổi kiểu dữ liệu của `Database` sang kiểu dữ liệu `python`.  
+##
+
+Tương tự với các bảng còn lại, ta cần người dùng cung cấp thông tin gì thì sử dụng `class tableBase`, và sẽ hiển thị những thông tin gì khi có người gọi api thì sử dụng `class tableDisplay`.  
+
+Xem ví dụ cụ thể [tại đây](schemas/schemas.py) 
