@@ -1,16 +1,15 @@
 from sqlalchemy import Unicode
 from db.database import Base
-from sqlalchemy import Column, Integer, String, DateTime, Table, NVARCHAR
-
-
+from sqlalchemy import Column, Integer, String, DateTime
 
 """
-Định nghĩa Bảng trong CSDL
+Định nghĩa tất cả các bảng trong SQL Server
 """
 
 class DbUser(Base):
     """
-    Bảng người dùng
+    Bảng người dùng  
+    Bảng này chứa thông tin về thông tin đăng nhập như : `username`, `password`, `email`
     """
     __tablename__ = "user"
     id = Column(Integer, primary_key= True, index= True)
@@ -23,11 +22,11 @@ class DbEmployee(Base):
     """
     Định nghĩa bảng nhân viên trong CSDL  
     - **tablename** là tên của bảng  
-    - **id code**: Mã nhân viên  
+    - **id code employee**: Mã nhân viên  
     - **id card**: Mã code phía sau thẻ nhân viên  
+    - **id vehicle**: Id phương tiện mà nhân viên đã đăng ký  
     - **username**: Họ tên nhân viên  
-    - **avatar**: Ảnh đại diện của nhân viên
-    - **vehicle**: Phương tiện di chuyển  
+    - **avatar**: Đường link hình ảnh nhân viên đã đăng ký với hệ thống  
     - **email**: Email của nhân viên  
     - **phone_number**: SĐT của nhân viên  
     - **section**: Bộ phận của nhân viên  
@@ -52,21 +51,18 @@ class DbEmployee(Base):
     other4 = Column(String)
     other5 = Column(String)
     
-  
-
 class DbImage_Employee(Base):
 
     """
     Định nghĩa bảng chứa hình ảnh về ảnh ra vào kèm thời gian ra vào của nhân viên  
-    - **tablename** là tên của bảng  
-    - **in_out**: Nhân viên vào hay ra nhà xe  
-    - **time**: Thời gian nhân viên vào hay ra nhà xe  
-    - **license_image_path**: Hình ảnh biển số xe nhân viên vào hay ra nhà xe  
-    - **background_image_path**: Hình ảnh toàn cảnh nhân viên vào hay ra nhà xe  
-    - **face_image_path**: Hình ảnh khuôn mặt nhân viên vào hay ra nhà xe  
-    - **location**: Vị trí chụp hình ảnh  
+    - **id employee**: Mã nhân viên vào/ra nhà xe  
+    - **in_out**: Trạng thái vào/ra của nhân viên  
+    - **time in**: Thời gian nhân viên vào nhà xe  
+    - **license_image_path in**: Hình ảnh biển số xe nhân viên vào nhà xe  
+    - **background_image_path in **: Hình ảnh toàn cảnh nhân viên vào nhà xe  
+    - **face_image_path in**: Hình ảnh khuôn mặt nhân viên vào nhà xe  
+    - **location in **: Vị trí làn vào của nhân viên  
     - **other**: các cột được bổ sung thông tin sau này  
-    - **employee**: Nhân viên vào hay ra nhà xe  
 
     Bảng này sẽ được tạo nếu nó chưa tồn tại trong CSDL
     """
@@ -94,14 +90,12 @@ class DbVehicle(Base):
 
     """
     Định nghĩa bảng chứa thông tin phương tiện của nhân viên  
-    - **tablename** là tên của bảng  
+    - **id_employee**: Mã nhân viên đã đăng ký phương tiện này  
     - **vehicle_name**: Tên phương tiện  
     - **model**: Phiên bản  
     - **color**: Màu sắc phương tiện  
     - **picture_vehicle**: Hình ảnh phương tiện  
-    - **employee**: Nhân viên đăng ký xe  
-    - **image**: Hình ảnh ra vào nhà xe của phương tiện  
-    - **other**: các cột được bổ sung thông tin sau này  
+    - **license_plate**: Biển số xe  
 
     Bảng này sẽ được tạo nếu nó chưa tồn tại trong CSDL
     """
@@ -143,4 +137,3 @@ class DbModeLane(Base):
     other3 = Column(String)
     other4 = Column(String)
     other5 = Column(String)
-

@@ -1,9 +1,8 @@
 from sqlalchemy.orm.session import Session
-from fastapi import HTTPException, status, UploadFile, File
+from fastapi import HTTPException, status
 from sqlalchemy import exc
 from db.model import DbEmployee, DbImage_Employee, DbVehicle, DbEmployeeVehicle
 from schemas.schemas import EmployeeBase
-from sqlalchemy import desc
 
 
 def create_employee(db: Session, request: EmployeeBase, avatar_path):
