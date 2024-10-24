@@ -106,7 +106,7 @@ Còn `drvier ODBC` ta lên trang chủ tải [Tại đây](https://learn.microso
 
 Nhớ lưu ý phiên bản dirver, như tôi đang sử dụng là `ODBC driver 18`.  
 
-Để đảm bảo có thể kết nối đến được `SQL Server` thì trước tiên bạn phỉa kết nối được với nó bằng `tài khoản` bất kỳ, có thể là sa hay tên khác. Ví dụ như hình ảnh bên dưới.  
+Để đảm bảo có thể kết nối đến được `SQL Server` thì trước tiên bạn phải kết nối được với nó bằng `tài khoản` bất kỳ, có thể là `sa` hay tên khác. Ví dụ như hình ảnh bên dưới.  
 
 ![Kết nối SQL server bằng tài khoản sa](image_github/sa_account_connect.png)
 
@@ -185,7 +185,9 @@ from sqlalchemy import Unicode
 from sqlalchemy import Column, Integer, String, DateTime
 ```
 `Integer`: Số nguyên  
-`String`: Chuỗi  
+`String`: Chuỗi, thêm (255) sẽ là số ký tự tối đa  
 `Unicode`: Chuỗi nhưng có dấu  
 `DateTime`: ngày giờ  
-...
+
+
+Xem ví dụ cụ thể [tại đây](db/model.py)  
