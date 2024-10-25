@@ -13,9 +13,13 @@ def create_user(db: Session, request: UserBase):
 
     """
     Tạo thông tin người dùng vào CSDL  
-    - **username**: Tên người dùng  
-    - **email**: Email người dùng  
-    - **password**: Mật khẩu người dùng, mật khẩu sẽ được mã hóa `bcrypt`
+    - `request`: Thông tin mà người dùng cần cung cấp  
+    Mật khẩu sẽ được mã hóa sau đó.  
+    Kết quả trả về:  
+    200:  
+    - `new_user`: Thông tin người dùng mới  
+    500:  
+    - `"message": "Lỗi khi thêm người dùng mới"`
     """
     
     new_user =  DbUser(
@@ -32,21 +36,25 @@ def create_user(db: Session, request: UserBase):
         # Trong quá trình insert lỗi thì giá trị id (cột IDENTITY) vẫn tự tăng, đây là hành vi mặc định của SQL Server
         db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Lỗi khi thêm người dùng mới"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "Lỗi khi thêm người dùng mới"
+            }
         )
     return new_user 
 
-def get_user_by_username(db: Session, username: str):
+def get_user_by_email(db: Session, email: str):
     """
-    Truy vấn thông tin người dùng với `username` được cung cấp  
+    Truy vấn thông tin người dùng với `email` được cung cấp  
     
     """
-    user = db.query(DbUser).filter(DbUser.username == username).first()
+    user = db.query(DbUser).filter(DbUser.email == email).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Không tìm thấy người dùng {username}"
+            detail= {
+                "message": f"Không tìm thấy người dùng có địa chỉ email:{email}"
+            }
         )
     
     return user

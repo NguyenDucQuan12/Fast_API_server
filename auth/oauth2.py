@@ -15,8 +15,9 @@ from db import db_user
 # Chỉ những bên có SECRET_KEY mới có thể xác thực và giải mã token.
 SECRET_KEY = '77407c7339a6c00544e51af1101c4abb4aea2a31157ca5f7dfd87da02a628107'
 ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 15
 
+# chỉ định endpoint để lấy token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
  
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -29,12 +30,15 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     # Tạo một bản sao data để thao tác, ko ảnh hưởng đến data gốc
     to_encode = data.copy()
 
+    # Thêm thời gian tồn tại cho token, nếu không cung cấp thì mặc định nó sẽ là 15 phút
     if expires_delta:
         expire = datetime.now() + expires_delta
     else:
-        expire = datetime.now() + timedelta(minutes=15)
+        expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({"exp": expire})
+
+    # Tạo token với khóa bí mật và phương thức tạo
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -46,18 +50,22 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     """
     credentials_exception = HTTPException(
         status_code= status.HTTP_401_UNAUTHORIZED,
-        detail= "Could not validat credentials",
+        detail= "Không thể xác thực đăng nhập",
         headers= {"WWW-Authenticate": "Bearer"}
     )
     try:
+        # Giải mã token dựa vào khóa bí mật và phương thức tạo
         payload = jwt.decode(token, SECRET_KEY, algorithms= [ALGORITHM])
-        username: str = payload.get("username")
-        if username is None:
+
+        # Trích xuất email từ Payload của JWT, bắt buộc lúc tạo token phải cung cấp `data` là `email` thì khi giải mã mới truy xuất được
+        email: str = payload.get("email")
+        if email is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
     
-    user = db_user.get_user_by_username(db, username=username)
+    # Truy vấn thông tin người dùng thông qua email đã giải mã
+    user = db_user.get_user_by_email(db, email=email)
     if user is None:
         raise credentials_exception
     return user

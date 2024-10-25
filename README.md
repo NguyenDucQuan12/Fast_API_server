@@ -13,19 +13,14 @@
   - [1. Tạo chuỗi kết nối](#1-tạo-chuỗi-kết-nối)
   - [2. Tạo bảng dữ liệu](#2-tạo-bảng-dữ-liệu)
   - [3. Thêm sửa xóa dữ liệu trong CSDL ](#3-thêm-sửa-xóa-dữ-liệu-trong-CSDL)
-  - [4. Chữ in đậm - Bold](#4-chữ-in-đậm---bold)
-  - [5. In đậm và in nghiêng](#5-in-đậm-và-in-nghiêng)
-  - [6. Chữ gạch giữa - Strikethrough](#6-chữ-gạch-giữa---strikethrough)
-  - [7. Code trong dòng - Inline Code](#7-code-trong-dòng---inline-code)
-- [2. Các khối](#2-các-khối)
-  - [1. Trích dẫn - Blockquote](#1-trích-dẫn---blockquote)
-  - [2. Danh sách có thứ tự - Ordered List](#2-danh-sách-có-thứ-tự---ordered-list)
-  - [3. Danh sách không có thứ tự - Unordered List](#3-danh-sách-không-có-thứ-tự---unordered-list)
-  - [4. Khối lệnh - Block Code](#4-khối-lệnh---block-code)
-  - [5. Bảng - Table](#5-bảng---table)
-- [3. Đặc biệt](#3-đặc-biệt)
-  - [1. Đường kẻ ngang - Horizonal rules](#1-đường-kẻ-ngang---horizonal-rules)
-  - [2. Liên kết - Link](#2-liên-kết---link)
+
+- [2. Mã hóa mật khẩu](#2-mã-hóa-mật-khẩu)
+  - [1. Mã hóa và giải mã](#1-mã-hóa-và-giải-mã)
+  - [2. Sử dụng](#2-sử-dụng)
+
+- [3. Token](#3-token)
+  - [1. Tạo token](#1-tạo-token)
+  - [2. Yêu cầu xác thực khi gọi api](#2-yêu-cầu-xác-thực-khi-gọi-api)
   - [3. Hình ảnh - Image](#3-hình-ảnh---image)
   - [4. Biểu tượng cảm xúc - Icon](#4-biểu-tượng-cảm-xúc---icon)
   - [5. Checkbox](#5-checkbox)
@@ -421,3 +416,312 @@ app.include_router(employee_router.router)
 model.Base.metadata.create_all(engine)
 ```
 Câu lệnh trên sẽ tự động kiểm tra bảng CSDL trên server đã có chưa, nếu chưa thì nó sẽ tự động tạo, nếu có rồi thì nó sẽ bỏ qua.  
+
+## 2. Mã hóa mật khẩu  
+
+Khi chúng ta tạo tài khoản người dùng, sẽ yêu cầu người dùng cung cấp mật khẩu, chúng ta cần mã hóa nó để lỡ nó bị lộ ra ngoài thì cũng giảm thiểu khả năng người khác biết được mật khẩu. Bởi vì ta đã mã hóa nó nên mật khẩu bây giờ chỉ còn là 1 dãy số.  
+
+![alt text](image_github/encode_password.png)
+
+Ta có thể thấy mật khẩu đã được mã hóa sang 1 dãy kí tự mà chỉ có thể dùng công cụ giải mã mới có thể dịch ngược được ra. Khi người dùng cung cấp mật khẩu của họ, ví dụ: `0000000` thì ta sẽ mã hóa nó thành `xhakwidsadahwidnakdiawh`. Sau đó khi người dùng đăng nhập, nó cũng sẽ giải mã ký tự này và so sánh với các ký tự từ người dùng, nếu khớp nhau thì đăng nhập thành công.
+
+### 1. Mã hóa vã giải mã
+Sử dụng thư viện `bcrypt` để mã hóa và giải mã các ký tự. Cài đặt thư viện theo lệnh `pip`:  
+
+```python
+pip install bcrypt
+```
+
+Ta chỉ cần cung cấp mật khẩu `(chuỗi string mà người dùng nhập )` thì nó sẽ trả về đoạn mã đã hash, và tự động so sánh với mật khẩu đã hash được lưu trong CSDL.  
+
+```python
+import bcrypt  # pip install bcrypt
+
+class Hash():
+
+    """
+    - **bcrypt**: Mã hóa mật khẩu người dùng
+    - **verify**: Kiểm tra mật khẩu được cung cấp có trùng với mật khẩu đã mã hóa hay không
+    """
+    # Hash a password using bcrypt
+    def bcrypt(password):
+        """
+        Mã hóa mật khẩu  
+        Chuyển đổi dạng str sang byte để xử lý
+        """
+        pwd_bytes = password.encode('utf-8')
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+        return hashed_password
+
+    # Check if the provided password matches the stored password (hashed)
+    def verify(plain_password, hashed_password):
+        """
+        Kiểm tra mật khẩu có trùng với mật khẩu đã mã hóa hay không  
+        Chuyển đổi dạng str sang byte để xử lý
+        """
+        password_byte_enc = plain_password.encode('utf-8')
+        hashed_password_bytes = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(password = password_byte_enc , hashed_password = hashed_password_bytes)
+```
+
+### 2. Sử dụng
+
+Ví dụ khi ta sử dụng để thêm người dùng, lưu thông tin đăng nhập của người dùng vào CSDL.  
+```python
+def create_user(db: Session, request: UserBase):
+
+    """
+    Tạo thông tin người dùng vào CSDL  
+    - `request`: Thông tin mà người dùng cần cung cấp  
+    Mật khẩu sẽ được mã hóa sau đó.  
+    Kết quả trả về:  
+    200:  
+    - `new_user`: Thông tin người dùng mới  
+    500:  
+    - `"message": "Lỗi khi thêm người dùng mới"`
+    """
+    
+    new_user =  DbUser(
+        username = request.username,
+        email = request.email ,
+        password = Hash.bcrypt(request.password)
+    )
+    try:
+        db.add(new_user)
+        db.commit()
+        # refresh giúp nhận được giá trị ID của người dùng, vì nó là giá trị tự tăng
+        db.refresh(new_user)
+    except exc.SQLAlchemyError as e:   
+        # Trong quá trình insert lỗi thì giá trị id (cột IDENTITY) vẫn tự tăng, đây là hành vi mặc định của SQL Server
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "Lỗi khi thêm người dùng mới"
+            }
+        )
+    return new_user 
+```
+
+Và khi đăng nhập thì ta sẽ so sánh như sau:  
+
+```python
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+
+def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """
+    Xác thực thông tin để đăng nhập
+    """
+    # Truy vấn thông tin người dùng dựa vào tên đăng nhập
+    user = db.query(DbUser).filter(DbUser.username == request.username).first()
+    if not user:
+        raise HTTPException(
+            status_code= status.HTTP_404_NOT_FOUND,
+            detail=f"Không tồn tại người dùng với tên: {request.username}"
+        )
+
+    # Lấy mật khẩu đã hash từ CSDL
+    hashed_password = user.password
+
+    # Nếu có người dùng thì so sánh mật khẩu trong CSDL với mật khẩu người dùng vừa nhập
+    if not Hash.verify(plain_password= request.password, hashed_password= hashed_password):
+        raise HTTPException(
+            status_code= status.HTTP_400_BAD_REQUEST,
+            detail=f"Mật khẩu vừa nhập không chính xác cho tài khoản: {request.username}"
+        )
+
+    return True
+```
+
+Xem ví dụ cụ thể [tại đây](db/hash.py)  
+
+## 3. Token
+Khi người dùng đăng nhập thành công, server sẽ tạo một token JWT chứa thông tin của người dùng (như email) và gửi nó về client. Client sẽ gửi kèm token trong các yêu cầu tiếp theo đến server. Server sẽ giải mã token để xác thực người dùng và cho phép truy cập tài nguyên hoặc thực hiện các hành động cụ thể.  
+### 1. Tạo token
+Để tạo một token ta sử dụng `jwt` từ thư viện `jose`. Cài đặt thư viện này thông qua lệnh `pip`:  
+```python
+pip install python-jose
+```
+Ta khởi tạo ba giá trị `SECRET_KEY` là khóa bí mật để giải mã token, `ALGORITHM` là thuật toán để tạo token, `ACCESS_TOKEN_EXPIRE_MINUTES` là thời hạn token tồn tại.  
+```python 
+# Khóa bí mật, nên tạo nó ngẫu nhiên bằng cách sau
+# mở terminal và chạy lệnh: openssl rand -hex 32
+# Khóa này chỉ dành cho việc phát triển API, không ai khác có thể sử dụng
+# Chỉ những bên có SECRET_KEY mới có thể xác thực và giải mã token.
+SECRET_KEY = '77407c7339a6c00544e51af1101c4abb4aea2a31157ca5f7dfd87da02a628107'
+ALGORITHM = 'HS256'
+ACCESS_TOKEN_EXPIRE_MINUTES = 15
+```
+
+Tiếp theo tạo `endpoint` để truy cập nhận token bằng `OAuth2PasswordBearer`.  
+```python
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+```
+Khi tạo token thì thường ta sẽ cho nó đi kèm với một vài thông tin liên quan đến người dùng, để đến khi giải mã token thì ta có thể lấy giá trị đó. Từu đó truy vấn ngược lại thông tin người dùng từ token. Thường chỉ nên đưa thông tin mà người dùng chỉ có duy nhất, để tránh trùng với người dùng khác, ví dụ như địa chỉ `email`, ...  
+```python
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """
+    Tạo token với tiêu chuẩn JWT (RFC 7591)  
+    - **data: dict**: Là dữ liệu mà bạn muốn mã hóa và lưu trữ trong JWT. 
+    Nó thường chứa thông tin về người dùng như `user_id`, `email`, hoặc bất kỳ dữ liệu nào khác mà bạn muốn bao gồm trong token.  
+    - **expires_delta**: Thời gian hết hạn của token, mặc định là 15 phút
+    """
+    # Tạo một bản sao data để thao tác, ko ảnh hưởng đến data gốc
+    to_encode = data.copy()
+
+    if expires_delta:
+        expire = datetime.now() + expires_delta
+    else:
+        expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+```
+Và để giải mã token lấy thông tin chứa trong token và sử dụng nó để xác thực người dùng ta sử dụng:  
+```python 
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+
+    """
+    Lấy thông tin người dùng hiện tại dựa vào `token`  
+    - `payload = jwt.decode(token, SECRET_KEY, algorithms= [ALGORITHM])` sẽ giải mã token dựa vào khóa bí mật và thuật toán đã sử dụng
+    """
+    credentials_exception = HTTPException(
+        status_code= status.HTTP_401_UNAUTHORIZED,
+        detail= "Không thể xác thực đăng nhập",
+        headers= {"WWW-Authenticate": "Bearer"}
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms= [ALGORITHM])
+
+        # Trích xuất email từ Payload của JWT với điều kiện khi tạo token thì data sẽ phải là email
+        email: str = payload.get("email")
+        if email is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    # Truy xuất thông tin người dùng từ email thu được ở token
+    user = db_user.get_user_by_email(db, email=email)
+    if user is None:
+        raise credentials_exception
+    return user
+```
+Cuối cùng ta cần tạo api để có thể lấy được token. Mỗi khi t gọi api này kèm theo đó là thông tin đăng nhập thì nó sẽ trả về cho chúng ta token, và ta sẽ sử dụng token này cho việc truy cập các api bị khóa. Địa chỉ endpoint phải trùng đại chỉ url khi ta tạo token. Như ở đây thì enpoint là `login` tương ứng với `oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")`.  
+
+```python
+@router.post("/login")
+def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(DbUser).filter(DbUser.username == request.username).first()
+    if not user:
+        raise HTTPException(
+            status_code= status.HTTP_404_NOT_FOUND,
+            detail=f"Not Found User with username: {request.username}"
+        )
+    hashed_password = user.password
+    if not Hash.verify(plain_password= request.password, hashed_password= hashed_password):
+        raise HTTPException(
+            status_code= status.HTTP_404_NOT_FOUND,
+            detail=f"Incorrect Password: {request.username}"
+        )
+    access_token = oauth2.create_access_token(data= {
+        "email": user.email
+    })
+    return {
+        "access_token": access_token,
+        "token_type": "bearer", # token tiêu chuẩn: bearer
+        "user_id": user.id,
+        "username": user.username
+    }
+```
+Việc sử dụng phương thức `POST` để lấy token là hợp lý, bởi ta phải gửi thông tin đăng nhập lên api để nó kiểm tra thông tin đăng nhập, nếu trùng khớp thì nó mới tiến hành tạo token và gửi trả về. Khi gửi thông tin nhạy cảm như tên đăng nhập và mật khẩu, sử dụng phương thức `POST` giúp đảm bảo rằng dữ liệu được gửi trong phần thân của yêu cầu và không xuất hiện trong URL, tăng cường bảo mật.  
+
+Một ví dụ cho việc lấy `token` bằng thư viện `request` như sau:  
+
+```python
+import requests
+
+url_get_token = "http://your-api-url.com/login"
+data = {
+    "username": "admin",
+    "password": "123456789"
+}
+response = requests.post(url=url_get_token, data=data)
+token = response.json().get("access_token")
+
+print(token)
+
+```
+Xem ví dụ cụ thể [tại đây](auth/authentication.py)  
+
+### 2. Yêu cầu xác thực khi gọi api
+
+Để yêu cầu người dùng xác thực khi gọi 1 api, xác thực thành công thì mói được truy cập các tài nguyên thì ta thêm hàm `get_current_user`.  
+Một số api yêu cầu người dùng xác thực như khi chỉnh sửa nội dung trên CSDL, đây là việc quan trọng nên không được phép cho người lạ thao tác, ta cần xác thực là người có đủ quyền để thao tác thì mới tiếp tục. Ví dụ như cập nhật avatar, thì chỉ người chủ tài khoản mới được phép cập nhật avatar của chính họ, không được phép cập nhật avtar của người khác.  
+```python
+# Cập nhật avatar cho nhân viên
+@router.post("/{id_code}/upload_avatar")
+def upload_avatar(id_code_employee: int, avatar: UploadFile = File(...), db: Session = Depends(get_db), current_user: UserAuth = Depends(get_current_user)):
+    """
+    Người dùng cập nhật hình ảnh  
+    Lưu hình ảnh vào server
+    """
+    # Lưu avatar và cập nhật đường dẫn vào cơ sở dữ liệu
+    avatar_path = save_avatar_upload_from_user(user_id_code=id_code_employee, avatar=avatar)
+    
+    return db_employee.upload_avatar(db= db, id_code_employee= id_code_employee, avatar_path= avatar_path)
+```
+
+Ta thêm `current_user: UserAuth = Depends(get_current_user)` trong hàm khi gọi api, khi có `Depends(function)` thì mặc định khi gọi đến api này các hàm trong `Depends` sẽ được gọi trước tiên. Khi đó hàm `get_current_user` sẽ chạy, nó sẽ yêu cầu token được cung cấp để biết đó là ai, từ đó mới cho phép thực thi api này.  
+Khi gọi api này bằng `python` như sau:  
+
+```python
+import requests
+
+# Địa chỉ API của bạn
+base_url = "http://192.168.0.100:8000"
+
+# Thông tin đăng nhập
+login_url = f"{base_url}/auth/login"
+login_data = {
+    "username": "admin",
+    "password": "123456789"
+}
+
+# Đăng nhập để lấy token
+login_response = requests.post(login_url, data=login_data)
+if login_response.status_code == 200:
+    token = login_response.json().get("access_token")
+    print("Đăng nhập thành công!")
+else:
+    print("Đăng nhập thất bại!")
+    exit()
+
+# Thông tin cập nhật avatar
+id_code_employee = 123  # Thay bằng mã nhân viên thực tế
+avatar_file_path = "/path/to/your/avatar.jpg"
+upload_url = f"{base_url}/{id_code_employee}/upload_avatar"
+
+# Mở file avatar
+with open(avatar_file_path, "rb") as avatar_file:
+    files = {
+        "avatar": avatar_file
+    }
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = requests.post(upload_url, files=files, headers=headers)
+
+if response.status_code == 200:
+    print("Cập nhật avatar thành công!")
+else:
+    print(f"Lỗi khi cập nhật avatar: {response.status_code}")
+    print("Nội dung phản hồi:", response.text)
+
+```
+
+Để gọi được api cập nhạt hình ảnh thì ta cần 2 bước.  
+Bước 1: Gọi api lấy token, ta cần gọi tới api `login` để đăng nhập và tạo 1 `token`, sau đó lưu giữu lại lại giá trị `token` này cho bước 2.  
+Bước 2: Gọi api cần xác thực đi kèm với đó là `token` đã lấy từ bước 1.

@@ -8,6 +8,7 @@ from auth import oauth2
 
 
 router = APIRouter(
+    prefix="/auth",
     tags=["authentication"]
 )
 
@@ -23,7 +24,7 @@ def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(
     ```python
     import requests
 
-    url_get_token = "http://172.31.99.42:8000/login"
+    url_get_token = "http://172.31.99.42:8000/auth/login"
     data = {
         "username": "admin",
         "password": "123456789"
@@ -43,14 +44,17 @@ def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(
             status_code= status.HTTP_404_NOT_FOUND,
             detail=f"Not Found User with username: {request.username}"
         )
+    # Lấy mật khẩu người dùng từ CSDL
     hashed_password = user.password
+    # so sánh mật khẩu người dùng vừa cung cấp với mật khẩu trong CSDL
     if not Hash.verify(plain_password= request.password, hashed_password= hashed_password):
         raise HTTPException(
             status_code= status.HTTP_404_NOT_FOUND,
             detail=f"Incorrect Password: {request.username}"
         )
+    # Tạo token với thông tin đi kèm là email
     access_token = oauth2.create_access_token(data= {
-        "username": user.username
+        "email": user.email
     })
     return {
         "access_token": access_token,
