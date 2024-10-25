@@ -8,7 +8,7 @@ from schemas.schemas import EmployeeBase
 def create_employee(db: Session, request: EmployeeBase, avatar_path):
     """
     Tạo thông tin nhân viên mới vào cơ sở dữ liệu  
-    Các thông tin yêu cầu người dùng cung cấp phải đầy đủ như đã khai báo ở 
+    Các thông tin yêu cầu người dùng cung cấp phải đầy đủ như đã khai báo ở `DbEmployee`
     
     """
     

@@ -220,10 +220,10 @@ class EmployeeBase(BaseModel):
 ```
 Class này sẽ chứa những thông tin mà ta cần người dùng cung cấp cho chúng ta, bạn có thể nhận thấy là nó đang thiếu 2 mục `avatar` và `other`.  
 
-> avatar là đường dẫn hình ảnh khi người dùng tải lên, việc người dùng vừa tải hình ảnh lên, vừa cung cấp các thông tin dạng json vào cùng 1 lúc sẽ gây ra lỗi khi gọi api. Vì vậy class này chỉ chứa các thông tin của người dùng, còn hình ảnh thì sau khi người dùng đã tạo hết thông tin thì sẽ có 1 api cho người dùng tải hình ảnh lên riêng. Vì vậy ở đây sẽ không có mục avatar.
+> avatar là đường dẫn hình ảnh khi người dùng tải lên, việc người dùng vừa tải hình ảnh lên, vừa cung cấp các thông tin dạng json vào cùng 1 lúc sẽ gây ra lỗi khi gọi api. Vì vậy class này chỉ chứa các thông tin của người dùng, còn hình ảnh thì sau khi người dùng đã tạo hết thông tin thì sẽ có 1 api cho người dùng tải hình ảnh lên riêng. Vì vậy ở đây sẽ không có mục avatar.  
 > Tương tự với other thì để dành cho sau này nên bây giờ nó chưa cần người dùng cung cấp thông tin nên sẽ không có vào.
 
-Sau khi có thông tin từ người dùng, ta cũng cần phản hồi lại cho người dùng 1 thông tin. Ví dụ kkhi bạn cung cấp thông tin để tạo tài khoản, tạo xong thì sẽ có một thông báo trả về với nội dung: `Bạn đã tạo thành công tài khoản với tên người dùng: xxx`. Người dùng cung cấp rất nhiều thông tin, nhưng chúng ta chỉ trả về đơn giản chỉ là những thông tin cần thiết. Không nhất thiết phải trả về đầy đủ thông tin và những thông tin có tính cá nhân `(email, sđt, mật khẩu)` thì tuyệt đối không trả về bừa bãi.  
+Sau khi có thông tin từ người dùng, ta cũng cần phản hồi lại cho người dùng 1 thông tin. Ví dụ khi bạn cung cấp thông tin để tạo tài khoản, tạo xong thì sẽ có một thông báo trả về với nội dung: `Bạn đã tạo thành công tài khoản với tên người dùng: xxx`. Người dùng cung cấp rất nhiều thông tin, nhưng chúng ta chỉ trả về đơn giản chỉ là những thông tin cần thiết. Không nhất thiết phải trả về đầy đủ thông tin và những thông tin có tính cá nhân `(email, sđt, mật khẩu)` thì tuyệt đối không trả về bừa bãi.  
 Vì vậy ta cũng tạo một class để hiển thị những thông tin trả về:  
 
 ```python
@@ -231,7 +231,7 @@ class EmployeeDisplay(BaseModel):
     """
     Trả về thông tin người dùng theo ý muốn, không trả về những thông tin quan trọng như password đã hash
     Lưu ý tên của các trường thông tin trả về phải giống nhau, nếu không gặp lỗi
-    - **id code**: Mã nhân viên  
+    - **id_code_employee**: Mã nhân viên  
     - **username**: Họ tên nhân viên  
     - **avatar**: Ảnh đại diện của nhân viên
     - **id_vehicle**: Phương tiện di chuyển  
@@ -254,4 +254,158 @@ Ta cần khai báo `Config` để khi ta lấy thông tin từ `SQL Server` tr�
 
 Tương tự với các bảng còn lại, ta cần người dùng cung cấp thông tin gì thì sử dụng `class tableBase`, và sẽ hiển thị những thông tin gì khi có người gọi api thì sử dụng `class tableDisplay`.  
 
-Xem ví dụ cụ thể [tại đây](schemas/schemas.py) 
+Xem ví dụ cụ thể [tại đây](schemas/schemas.py)  
+
+##  
+Tất cả các công việc liên quan với `Database` trong `FastAPI` thì ta sẽ sử dụng thư viện `sqlachemy` để thao tác.  
+Với việc thêm 1 trường dữ liệu vào bảng trong `SQL Server` ta làm như sau:  
+
+```python
+def create_employee(db: Session, request: EmployeeBase, avatar_path: str = "Not upload"):
+    """
+    Tạo thông tin nhân viên mới vào cơ sở dữ liệu  
+    Các thông tin yêu cầu người dùng cung cấp phải đầy đủ như đã khai báo ở `DbEmployee`
+    
+    """
+    
+    new_employee = DbEmployee(
+        id_code_employee = request.id_code_employee,
+        id_card = request.id_card,
+        id_vehicle = request.id_vehicle,
+        username = request.username,
+        avatar = avatar_path,
+        email = request.email,
+        phone_number=request.phone_number,
+        section = request.section,
+        permission = request.permission,
+        other1 = "Not use",
+        other2 = "Not use",
+        other3 = "Not use",
+        other4 = "Not use",
+        other5 = "Not use",
+    )
+
+    try:
+        db.add(new_employee)
+        db.commit()
+        db.refresh(new_employee)
+    except exc.SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(
+            status_code= status.HTTP_400_BAD_REQUEST,
+            detail= f"Thêm nhân viên mới không thành công, lỗi: {e}"
+        )
+    return new_employee
+```
+
+Khi ta tạo một đối tượng `new_employee` thì ta cần phải cung cấp đầy đủ thông tin mà bảng đó cần. Với bảng `employee` thì ta cần các trường: `id_code_employee`, `id_card`, `id_vehicle`, `username`, `avatar`, `email`, `phone_number`, `section`, `permission`, `other1-5`. Vì vậy đối tượng `new_employee` sẽ phải đầy đủ những thông tin đó.  
+Các thông tin này sẽ được lấy từ biến `request` là đối tượng thuộc class `EmployeeBase`. Hai trường `avatar` và `other` mình điền là các chuỗi string mặc định. Bởi vì trong class `EmployeeBase` mình không khai báo 2 trường này nên `request` không có 2 thuộc tính này để truy cập.  
+Ta có thể thêm thời gian bằng thư viện `datetime` như sau: `time_in = datetime.datetime.now()`  
+Sau khi tạo một đối tượng mới cho bảng `employee` thì ta sẽ thêm nó vào DB bằng câu lệnh:  
+
+```python
+try:
+        db.add(new_employee)
+        db.commit()
+        db.refresh(new_employee)
+except exc.SQLAlchemyError as e:
+    db.rollback()
+    print(e)
+
+    raise HTTPException(
+        status_code= status.HTTP_400_BAD_REQUEST,
+        detail= "Thêm nhân viên mới không thành công"
+    )
+```
+
+Sau khi sử dụng câu lệnh `add` thì phải `commit` để lúc đấy mới chính thức đưa dữ liệu lên DB, và chúng ta `refresf(new_employy)` để cập nhật lại các giá trị index. Việc thêm sửa xóa dữ liệu ở DB có nguy cơ lỗi rất cao nên chúng ta phải sử dụng `try-except` để đảm bảo nếu trong quá trình ghi dữ liệu lỗi thì có thể `rollback` lại để quay trở lại trước khi xảy ra lỗi. Và sau đó dưa ra một `Exception` kèm theo `mã code lỗi` và chi tiết lỗi. Như vậy khi gọi api mà ta nhận mã code `200` là thêm dữ liệu thành công, được mã lỗi `400` là ta biết được rằng trong quá trình thêm dữ liệu bị lỗi và đã `rollback`, còn các mã lỗi khác thì có thể gặp vấn đề với kết nối với server. Việc này giúp ta nắm rõ hơn các trường hợp xảy ra khi gọi api.  
+
+Sau khi có hàm tạo nhân viên thì ta sẽ tiến hành tạo một api gọi đến hàm này.  
+
+```python
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm.session import Session
+from schemas.schemas import EmployeeDisplay, EmployeeBase
+from db.database import get_db
+from db import db_employee
+
+router = APIRouter(
+    prefix="/employee",
+    tags=["employee"]
+)
+
+# Tạo thông tin nhân viên vào CSDL
+@router.post("",response_model= EmployeeDisplay)
+def create_user(request: EmployeeBase, db: Session = Depends(get_db)): # avatar: UploadFile = File(...): không thể vừa tải lên Json vừa uploadfile
+    """
+    Tạo thông tin nhân viên vào CSDL, việc tạo thông tin và cập nhật hình ảnh không thể thực hiện cùng lúc  
+
+    """
+    avatar_path = "None"
+    
+    return db_employee.create_employee(db= db, request= request, avatar_path = avatar_path)
+```
+File này sẽ chứa tất cả các api mà có liên quan đến bnagr `Employee` trong CSDL.  
+```python
+router = APIRouter(
+    prefix="/employee",
+    tags=["employee"]
+)
+```
+Tạo `router` với các thông tin ban đầu như trên. Vì vậy với mỗi api ở đây đều thêm tiền tố `/employee` trước đường dẫn api. Ví dụ nếu ta tạo api với đường dẫn `/get_employee` thì nó sẽ trở thành `http://IP:Port/employee/get_employee`.  
+Để tạo 1 api trong `FastAPI` thì cần khai báo phương thức truy cập của api đầu tiên. Theo chuẩn REST thì như bên dưới, đây là 1 chuẩn khá thông dụng, bạn không theo tiêu chuẩn này cũng không sao:  
+> GET: Là api cho phép truy cập lên server và lấy dữ liệu về. Ví dụ gọi api lấy thông tin nhân viên, lấy thông tin mật khẩu người dùng, ...  
+> POST: Là đưa dữ liệu mới lên server. Ví dụ như tạo thông tin cho nhân viên mới, tạo thông tin đăng nhập mới, ...  
+> PUT: Là sửa, cập nhật dữ liệu trên server. Ví dụ như cập nhật dữ liệu người dùng, ...  
+> DELETE: Xóa một dữ liệu trên server.
+Vậy là ta đã có 1 api tạo thông tin nhân viên lên CSDL. Để api này hoạt động thì ta sẽ thêm nó vào api chính. Ta tạo file `main.py` sẽ chứa tất cả các api con.  
+
+```python
+from fastapi import FastAPI # pip install "fastapi[standard]"
+import uvicorn
+from db.database import engine
+from db import model
+from router import employee_router
+
+app = FastAPI(
+    docs_url="/myapi",  # Đặt đường dẫn Swagger UI thành "/myapi"
+    redoc_url=None  # Tắt Redoc UI
+)
+
+app.include_router(employee_router.router)
+
+# Tạo Bảng trong DB nếu nó chưa tồn tại
+model.Base.metadata.create_all(engine)
+
+
+if __name__ == "__main__":
+    # Chạy file này bằng cách `python service\main.py`
+    # sẽ lấy máy chạy file này làm máy chủ, các máy tính cùng dải mạng đều có thể truy cập API này
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+    # Hoặc gõ trực tiếp lệnh `fastapi dev main.py` để vào chế độ developer
+    # Hoặc gõ trực tiếp lệnh `fastapi run main.py` để vào chế độ lấy máy chạy làm server
+
+```
+
+Ta sẽ khởi tạo `FastAPI` với tên gọi `app` để khi chạy thì `FastAPI` tự tìm thấy nó và khởi chạy.  
+
+```python
+app = FastAPI(
+    docs_url="/myapi",  # Đặt đường dẫn Swagger UI thành "/myapi"
+    redoc_url=None  # Tắt Redoc UI
+)
+```
+Ta có thể tùy chỉnh đường dẫn `docs` mặc định thành đường dẫn mà ta mong muốn.  
+
+```python
+app.include_router(employee_router.router)
+```
+Câu lệnh này sẽ thêm các api được khai báo ở ở file `employee_router` mà ta đã tạo.  
+
+```python
+router = APIRouter(
+    prefix="/employee",
+    tags=["employee"]
+)
+```
