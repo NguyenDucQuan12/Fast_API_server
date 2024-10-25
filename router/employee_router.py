@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
 from sqlalchemy.orm.session import Session
 from fastapi.responses import FileResponse
 from typing import List
@@ -40,45 +40,39 @@ def upload_avatar(id_code_employee: int, avatar: UploadFile = File(...), db: Ses
     return db_employee.upload_avatar(db= db, id_code_employee= id_code_employee, avatar_path= avatar_path)
 
 # Truy xuất tất cả thông tin của nhân viên
-@router.get("/get_all_employee", response_model=list[ EmployeeDisplay])
+@router.get("/get_all_employee", response_model=List[EmployeeDisplay])
 def get_all_employee(db: Session = Depends(get_db)):
     """
     Truy xuất tất cả thông tin nhân viên trong CSDL
     """
     return db_employee.get_all_employee(db= db)
 
-@router.get("/view/{name}", response_class= FileResponse )
-def get_file(name: str):
+# Xóa thông tin của một nhân viên
+@router.delete("/delete/{id_code_employee}")
+def delete_employee(id_code_employee: int, db: Session = Depends(get_db), current_user : UserAuth = Depends(get_current_user)):
     """
-    API cho phép người dùng tải xuống tệp tin từ server  
-    Yêu cầu trạng thái phản hồi là **response_class= FileResponse**  
-    - **name**: là tệp tin mà người dùng muốn tải, nó yêu cầu cả đuôi như cat.png, requirements.txt
-    ## Ví dụ
-    ```python
-    import requests
-
-    # URL của API mà bạn muốn tải xuống tệp
-    url_view_file = "http://localhost:8000/file/view/cat.png"
-
-    # Gửi yêu cầu GET để tải xuống tệp
-    response = requests.get(url_view_file)
-
-    # Kiểm tra nếu yêu cầu thành công
-    if response.status_code == 200:
-        # Lưu tệp vào đĩa
-        with open("downloaded_cat.png", "wb") as file:
-            file.write(response.content)
-        print("File downloaded successfully.")
-    else:
-        print(f"Failed to download file. Status code: {response.status_code}")
-    ```
+    Xóa thông tin của một nhân viên bằng mã nhân viên
     """
+    db_employee.delete_employee(db= db, id_code_employee= id_code_employee, current_admin= current_user)
 
-    path = f"files/{name}"
+# Xem hình ảnh của nhân viên
+@router.get("/view/{id_code_employee}", response_class= FileResponse )
+def get_file(id_code_employee: int):
+    """
+    Xem hình ảnh của nhân viên thông qua mã nhân viên  
+    Chỉ cần gọi api này trên web là được,ví dụ: `http://127.0.0.1:8000/employee/view/238299`  
+    """
+    # Đường dẫn chứa hình ảnh nhân viên
+    path = f"data/employee/{id_code_employee}/avatars/avatar.png"
 
     # Kiểm tra xem tệp có tồn tại không
     if not os.path.exists(path):
-        raise HTTPException(status_code=404, detail="File not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail= {
+                "message": f"Nhân viên {id_code_employee} không tồn tại hoặc chưa cung cấp hình ảnh"
+            }
+        )
     
     return path
 
@@ -111,9 +105,15 @@ def download_avatar(id_code: int):
     """
 
     file_path = f"data/employee/{id_code}/avatars/avatar.png"
+
     # Kiểm tra xem tệp có tồn tại trên server không
     if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="Không có thư mục của nhân viên này")
+        raise HTTPException(
+            status_code= status.HTTP_404_NOT_FOUND,
+            detail= {
+                "message": f"Không tồn tại hình ảnh nhân viên có mã nhân viên: {id_code}"
+            }
+        )
 
     # Trả về tệp để tải xuống
     return FileResponse(file_path, media_type="image/jpeg", filename=os.path.basename(file_path))
@@ -121,5 +121,8 @@ def download_avatar(id_code: int):
 # Truy xuất thông tin nhân viên dựa trên biển số xe
 @router.get("/{license_plate}/information", response_model= EmployeeDisplay)
 def get_employee_from_license_plate(license_plate: str, db: Session = Depends(get_db)):
+    """
+    Truy xuất thông tin nhân viên dựa vào thông tin biển số đã đăng ký
+    """
 
     return db_employee.get_employee_from_license_plate(db= db, license_plate= license_plate)

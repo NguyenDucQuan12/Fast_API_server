@@ -52,7 +52,7 @@ fastapi dev main.py
 ```
 ![chạy fastapi với câu lệnh dev](image_github/fast_api_run_dev.png)
 
-Câu lệnh này sẽ chạy `FastAPI` trên môi trường `Developer`, có ngĩa là môi trường test, khi bạn đang chạy `server: là khởi chạy fastapi` và bạn thay đổi một số đoạn `code`, chỉnh sửa thêm một số file thì khi bạn lưu lại code nó sẽ tự động khởi động lại server, không cần ta phải chạy lại câu lệnh `fastapi dev main.py`.  
+Câu lệnh này sẽ chạy `FastAPI` trên môi trường `Developer`, có nghĩa là môi trường test, khi bạn đang chạy `server (là khởi chạy fastapi)` và bạn thay đổi một số đoạn `code`, chỉnh sửa thêm một số file thì khi bạn lưu lại code nó sẽ tự động khởi động lại server, không cần ta phải chạy lại câu lệnh `fastapi dev main.py`.  
 
 Và khi chạy lệnh này thì bạn chỉ có thể truy cập vào các địa chỉ có sẵn từ máy của bạn như:  
 `http://127.0.0.1:8000/docs ` để xem toàn bộ api  
@@ -60,6 +60,7 @@ Và khi chạy lệnh này thì bạn chỉ có thể truy cập vào các đị
 
 Và chỉ có duy nhất máy chủ có thể truy cập, các máy khác chưa thể truy cập được api này, vì vậy câu lệnh này chỉ chạy trên môi trường `dev`  
 
+Cách thứ 2 ta có thể khởi động server là:  
 ```python
 fastapi run main.py
 ```
@@ -104,7 +105,7 @@ Còn `drvier ODBC` ta lên trang chủ tải [Tại đây](https://learn.microso
 
 ![ODBC driver](image_github/ODBC_driver.png)
 
-Nhớ lưu ý phiên bản dirver, như tôi đang sử dụng là `ODBC driver 18`.  
+Nhớ lưu ý phiên bản driver, như tôi đang sử dụng là `ODBC driver 18`.  
 
 Để đảm bảo có thể kết nối đến được `SQL Server` thì trước tiên bạn phải kết nối được với nó bằng `tài khoản` bất kỳ, có thể là `sa` hay tên khác. Ví dụ như hình ảnh bên dưới.  
 
@@ -149,8 +150,8 @@ class DbEmployee(Base):
     """
     Định nghĩa bảng nhân viên trong CSDL  
     - **tablename** là tên của bảng  
-    - **id code**: Mã nhân viên  
-    - **id card**: Mã code phía sau thẻ nhân viên  
+    - **id_code_employee*: Mã nhân viên  
+    - **id_card**: Mã code phía sau thẻ nhân viên  
     - **username**: Họ tên nhân viên  
     - **avatar**: Ảnh đại diện của nhân viên
     - **vehicle**: Phương tiện di chuyển  
@@ -220,11 +221,11 @@ class EmployeeBase(BaseModel):
 ```
 Class này sẽ chứa những thông tin mà ta cần người dùng cung cấp cho chúng ta, bạn có thể nhận thấy là nó đang thiếu 2 mục `avatar` và `other`.  
 
-> avatar là đường dẫn hình ảnh khi người dùng tải lên, việc người dùng vừa tải hình ảnh lên, vừa cung cấp các thông tin dạng json vào cùng 1 lúc sẽ gây ra lỗi khi gọi api. Vì vậy class này chỉ chứa các thông tin của người dùng, còn hình ảnh thì sau khi người dùng đã tạo hết thông tin thì sẽ có 1 api cho người dùng tải hình ảnh lên riêng. Vì vậy ở đây sẽ không có mục avatar.  
+> Avatar là đường dẫn hình ảnh khi người dùng tải lên, việc người dùng vừa tải hình ảnh lên, vừa cung cấp các thông tin dạng json vào cùng 1 lúc sẽ gây ra lỗi khi gọi api. Vì vậy class này chỉ chứa các thông tin của người dùng, còn hình ảnh thì sau khi người dùng đã tạo hết thông tin thì sẽ có 1 api cho người dùng tải hình ảnh lên riêng. Vì vậy ở đây sẽ không có mục avatar.  
 > Tương tự với other thì để dành cho sau này nên bây giờ nó chưa cần người dùng cung cấp thông tin nên sẽ không có vào.
 
-Sau khi có thông tin từ người dùng, ta cũng cần phản hồi lại cho người dùng 1 thông tin. Ví dụ khi bạn cung cấp thông tin để tạo tài khoản, tạo xong thì sẽ có một thông báo trả về với nội dung: `Bạn đã tạo thành công tài khoản với tên người dùng: xxx`. Người dùng cung cấp rất nhiều thông tin, nhưng chúng ta chỉ trả về đơn giản chỉ là những thông tin cần thiết. Không nhất thiết phải trả về đầy đủ thông tin và những thông tin có tính cá nhân `(email, sđt, mật khẩu)` thì tuyệt đối không trả về bừa bãi.  
-Vì vậy ta cũng tạo một class để hiển thị những thông tin trả về:  
+Sau khi có thông tin từ người dùng, ta cũng cần phản hồi lại cho người dùng 1 thông tin. Ví dụ khi bạn cung cấp thông tin để tạo tài khoản, tạo xong thì sẽ có một thông báo trả về với nội dung: `Bạn đã tạo thành công tài khoản với tên người dùng: xxx`. Người dùng cung cấp rất nhiều thông tin, nhưng chúng ta trả về đơn giản chỉ là những thông tin cần thiết. Không nhất thiết phải trả về đầy đủ thông tin và những thông tin có tính cá nhân `(email, sđt, mật khẩu)` thì tuyệt đối không trả về bừa bãi.  
+Vì vậy ta cũng tạo một class để hiển thị những thông tin trả về, và sau này chỉ cần gọi class này trong phản hồi thì nó sẽ tự động trả về những thông tin mà mình đã chỉ định:  
 
 ```python
 class EmployeeDisplay(BaseModel):
@@ -301,7 +302,7 @@ def create_employee(db: Session, request: EmployeeBase, avatar_path: str = "Not 
 Khi ta tạo một đối tượng `new_employee` thì ta cần phải cung cấp đầy đủ thông tin mà bảng đó cần. Với bảng `employee` thì ta cần các trường: `id_code_employee`, `id_card`, `id_vehicle`, `username`, `avatar`, `email`, `phone_number`, `section`, `permission`, `other1-5`. Vì vậy đối tượng `new_employee` sẽ phải đầy đủ những thông tin đó.  
 Các thông tin này sẽ được lấy từ biến `request` là đối tượng thuộc class `EmployeeBase`. Hai trường `avatar` và `other` mình điền là các chuỗi string mặc định. Bởi vì trong class `EmployeeBase` mình không khai báo 2 trường này nên `request` không có 2 thuộc tính này để truy cập.  
 Ta có thể thêm thời gian bằng thư viện `datetime` như sau: `time_in = datetime.datetime.now()`  
-Sau khi tạo một đối tượng mới cho bảng `employee` thì ta sẽ thêm nó vào DB bằng câu lệnh:  
+Sau khi tạo một đối tượng mới cho bảng `employee` thì ta sẽ thêm nó vào DB thông qua `db:session` là một phiên kết nối tới `SQL Server` bằng câu lệnh:  
 
 ```python
 try:
@@ -335,7 +336,7 @@ router = APIRouter(
 )
 
 # Tạo thông tin nhân viên vào CSDL
-@router.post("",response_model= EmployeeDisplay)
+@router.post("/create_employee",response_model= EmployeeDisplay)
 def create_user(request: EmployeeBase, db: Session = Depends(get_db)): # avatar: UploadFile = File(...): không thể vừa tải lên Json vừa uploadfile
     """
     Tạo thông tin nhân viên vào CSDL, việc tạo thông tin và cập nhật hình ảnh không thể thực hiện cùng lúc  
@@ -345,19 +346,31 @@ def create_user(request: EmployeeBase, db: Session = Depends(get_db)): # avatar:
     
     return db_employee.create_employee(db= db, request= request, avatar_path = avatar_path)
 ```
-File này sẽ chứa tất cả các api mà có liên quan đến bnagr `Employee` trong CSDL.  
+File này sẽ chứa tất cả các api mà có liên quan đến bảng `Employee` trong CSDL.  
+
 ```python
 router = APIRouter(
     prefix="/employee",
     tags=["employee"]
 )
 ```
-Tạo `router` với các thông tin ban đầu như trên. Vì vậy với mỗi api ở đây đều thêm tiền tố `/employee` trước đường dẫn api. Ví dụ nếu ta tạo api với đường dẫn `/get_employee` thì nó sẽ trở thành `http://IP:Port/employee/get_employee`.  
+Tạo `router` với các thông tin ban đầu như trên. Vì vậy với mỗi api ở đây đều từ động thêm tiền tố `/employee` trước đường dẫn api. Ví dụ nếu ta tạo api với đường dẫn `/get_employee` thì nó sẽ trở thành `http://IP:Port/employee/get_employee`.  
 Để tạo 1 api trong `FastAPI` thì cần khai báo phương thức truy cập của api đầu tiên. Theo chuẩn REST thì như bên dưới, đây là 1 chuẩn khá thông dụng, bạn không theo tiêu chuẩn này cũng không sao:  
+
 > GET: Là api cho phép truy cập lên server và lấy dữ liệu về. Ví dụ gọi api lấy thông tin nhân viên, lấy thông tin mật khẩu người dùng, ...  
 > POST: Là đưa dữ liệu mới lên server. Ví dụ như tạo thông tin cho nhân viên mới, tạo thông tin đăng nhập mới, ...  
 > PUT: Là sửa, cập nhật dữ liệu trên server. Ví dụ như cập nhật dữ liệu người dùng, ...  
-> DELETE: Xóa một dữ liệu trên server.
+> DELETE: Xóa một dữ liệu trên server.  
+
+![alt text](image_github/api_get_use_browser.png)
+
+### Chỉ có phương thức GET là có thể truy cập được bằng đường link dán trực tiếp lên trình duyệt  
+
+Ta tạo 1 api để tạo dữ liệu cho 1 nhân viên mới nên sẽ dùng `POST`:  `@router.post("/create_employee",response_model= EmployeeDisplay)`  
+api này sẽ có đường dẫn `http://IP:port/employee/create_employee`, và kết quả trả về khi gọi api này sẽ theo định dạng class `EmployeeDisplay` mà ta đã khai báo [ở đây](schemas/schemas.py).  
+
+Các thông tin cần cung cấp cho api này là `EmployeeBase`, class chứa thông tin mà người dùng cung cấp, `db: Session = Depends(get_db)` sẽ tạo kết nối đến với CSDL  
+
 Vậy là ta đã có 1 api tạo thông tin nhân viên lên CSDL. Để api này hoạt động thì ta sẽ thêm nó vào api chính. Ta tạo file `main.py` sẽ chứa tất cả các api con.  
 
 ```python
@@ -396,16 +409,15 @@ app = FastAPI(
     redoc_url=None  # Tắt Redoc UI
 )
 ```
-Ta có thể tùy chỉnh đường dẫn `docs` mặc định thành đường dẫn mà ta mong muốn.  
+Ta có thể tùy chỉnh đường dẫn `docs` mặc định thành đường dẫn mà ta mong muốn. Để thêm các `api router` thì ta phải dùng lệnh `include_router`, khi đó các api nằm trong router này sẽ được thêm. Nếu không `include_router` thì nó sẽ không chạy.  
 
 ```python
 app.include_router(employee_router.router)
 ```
-Câu lệnh này sẽ thêm các api được khai báo ở ở file `employee_router` mà ta đã tạo.  
+
 
 ```python
-router = APIRouter(
-    prefix="/employee",
-    tags=["employee"]
-)
+# Tạo Bảng trong DB nếu nó chưa tồn tại
+model.Base.metadata.create_all(engine)
 ```
+Câu lệnh trên sẽ tự động kiểm tra bảng CSDL trên server đã có chưa, nếu chưa thì nó sẽ tự động tạo, nếu có rồi thì nó sẽ bỏ qua.  
