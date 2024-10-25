@@ -21,10 +21,8 @@
 - [3. Token](#3-token)
   - [1. Tạo token](#1-tạo-token)
   - [2. Yêu cầu xác thực khi gọi api](#2-yêu-cầu-xác-thực-khi-gọi-api)
-  - [3. Hình ảnh - Image](#3-hình-ảnh---image)
-  - [4. Biểu tượng cảm xúc - Icon](#4-biểu-tượng-cảm-xúc---icon)
-  - [5. Checkbox](#5-checkbox)
-  - [6. Escape markdown](#6-escape-markdown)
+
+- [4. Triển khai API với model AI](#4-triển-khai-api-với-model-ai)
 
 [III. Kết thúc](#iii-kết-thúc)
 
@@ -658,8 +656,8 @@ Xem ví dụ cụ thể [tại đây](auth/authentication.py)
 
 ### 2. Yêu cầu xác thực khi gọi api
 
-Để yêu cầu người dùng xác thực khi gọi 1 api, xác thực thành công thì mói được truy cập các tài nguyên thì ta thêm hàm `get_current_user`.  
-Một số api yêu cầu người dùng xác thực như khi chỉnh sửa nội dung trên CSDL, đây là việc quan trọng nên không được phép cho người lạ thao tác, ta cần xác thực là người có đủ quyền để thao tác thì mới tiếp tục. Ví dụ như cập nhật avatar, thì chỉ người chủ tài khoản mới được phép cập nhật avatar của chính họ, không được phép cập nhật avtar của người khác.  
+Để yêu cầu người dùng xác thực khi gọi 1 api, xác thực thành công thì mới được truy cập các tài nguyên thì ta thêm hàm `get_current_user`.  
+Một số api yêu cầu người dùng xác thực như khi chỉnh sửa nội dung trên CSDL, đây là việc quan trọng nên không được phép cho người lạ thao tác, ta cần xác thực là người có đủ quyền để thao tác thì mới tiếp tục. Ví dụ như cập nhật avatar, thì chỉ người chủ tài khoản mới được phép cập nhật avatar của chính họ, không được phép cập nhật avatar của người khác.  
 ```python
 # Cập nhật avatar cho nhân viên
 @router.post("/{id_code}/upload_avatar")
@@ -668,6 +666,7 @@ def upload_avatar(id_code_employee: int, avatar: UploadFile = File(...), db: Ses
     Người dùng cập nhật hình ảnh  
     Lưu hình ảnh vào server
     """
+    # Thêm 1 bước nữa là lấy thông tin current_user xem id của người này có giống với id của người cần cập nhật avatar không, nếu cùng id thì chứng tỏ đó là chủ tài khoản thì mới cho cập nhật. Tránh trường hợp người khác đăng nhập và cập nhật avatar của người khác
     # Lưu avatar và cập nhật đường dẫn vào cơ sở dữ liệu
     avatar_path = save_avatar_upload_from_user(user_id_code=id_code_employee, avatar=avatar)
     
@@ -722,6 +721,10 @@ else:
 
 ```
 
-Để gọi được api cập nhạt hình ảnh thì ta cần 2 bước.  
-Bước 1: Gọi api lấy token, ta cần gọi tới api `login` để đăng nhập và tạo 1 `token`, sau đó lưu giữu lại lại giá trị `token` này cho bước 2.  
-Bước 2: Gọi api cần xác thực đi kèm với đó là `token` đã lấy từ bước 1.
+Để gọi được api cập nhật hình ảnh thì ta cần 2 bước.  
+Bước 1: Gọi api lấy token, ta cần gọi tới api `login` để đăng nhập và tạo 1 `token`, sau đó lưu giữ lại lại giá trị `token` này cho bước 2.  
+Bước 2: Gọi api cần xác thực đi kèm với đó là `token` đã lấy từ bước 1.  
+
+Xem ví dụ cụ thể [tại đây](router/employee_router.py)  
+
+## 4. Triển khai API với model AI
