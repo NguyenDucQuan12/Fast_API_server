@@ -425,7 +425,7 @@ Khi chúng ta tạo tài khoản người dùng, sẽ yêu cầu người dùng 
 
 Ta có thể thấy mật khẩu đã được mã hóa sang 1 dãy kí tự mà chỉ có thể dùng công cụ giải mã mới có thể dịch ngược được ra. Khi người dùng cung cấp mật khẩu của họ, ví dụ: `0000000` thì ta sẽ mã hóa nó thành `xhakwidsadahwidnakdiawh`. Sau đó khi người dùng đăng nhập, nó cũng sẽ giải mã ký tự này và so sánh với các ký tự từ người dùng, nếu khớp nhau thì đăng nhập thành công.
 
-### 1. Mã hóa vã giải mã
+### 1. Mã hóa và giải mã
 Sử dụng thư viện `bcrypt` để mã hóa và giải mã các ký tự. Cài đặt thư viện theo lệnh `pip`:  
 
 ```python

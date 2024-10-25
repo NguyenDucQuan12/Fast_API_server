@@ -1,6 +1,8 @@
 # import tensorflow as tf
 from fastapi import FastAPI # pip install "fastapi[standard]"
 import uvicorn
+import os
+from fastapi.responses import FileResponse
 from fastapi_cache.backends.inmemory import InMemoryBackend
 from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
@@ -62,6 +64,14 @@ app.include_router(update_app.router)
 @app.get("/")
 def read_root():
     return {"Message": "World"}
+
+# Tạo icon cho trang web api, nó sẽ hiển thị hình ảnh favicon ở thư mục `static/favicon.ico`
+@app.get('/favicon.ico')
+async def favicon():
+    file_name = "favicon.ico"
+    file_path = os.path.join(app.root_path, "static", file_name)
+    return FileResponse(path=file_path, headers={"Content-Disposition": "attachment; filename=" + file_name})
+
 
 # Tạo Bảng trong DB nếu nó chưa tồn tại
 model.Base.metadata.create_all(engine)

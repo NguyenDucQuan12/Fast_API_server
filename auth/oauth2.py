@@ -54,6 +54,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         headers= {"WWW-Authenticate": "Bearer"}
     )
     try:
+        # ví dụ ta có token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InR2Y19hZG1faXRAdGVydW1vLmNvLmpwIiwiZXhwIjoxNzI5ODcxMjQ2fQ.G-m2PjheT-zIQ7R9TkD9LWngHbZSeKF1LK8obtmE93k
+        # Các giá trị ở giữa 2 dấu chấm sẽ là payload, từ đó ta có thể giải mã được giá trị ta đính kèm vào đó.
+        # ta thu đưuọc email và thời gian token hết hạn, vì vậy không được để lộ token, vì khi đó người khác có thể giải mã và thu được thông tin từ token
         # Giải mã token dựa vào khóa bí mật và phương thức tạo
         payload = jwt.decode(token, SECRET_KEY, algorithms= [ALGORITHM])
 
