@@ -920,7 +920,34 @@ Ta sẽ tải lại mô hình đã huấn luyện và huấn luyện dựa theo 
 Xem thêm ví dụ [tại đây](models/setup_yolo_model.py)
 ### 2. PaddleOCR
 
+Để đọc các ký tự trên hình ảnh thành các dòng text thì ta sửu dụng phương pháp `nhận diện quang học` hay còn gọi là `OCR`. Ta có nhiều mô hình có thể `OCR` như `VietOCR`, `easyOCR`, `VinOCR`, ...  
+Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR), là một công cụ khá là mạnh mẽ và nhẹ, rất dễ dàng sử dụng nên nó sẽ là lựa chọn đầu tiên của mình.  
+
+<p align="center">
+ <img src="https://github.com/PaddlePaddle/PaddleOCR/releases/download/v2.8.0/PaddleOCR_logo.png" align="middle" width = "600"/>
+</p>
+
+
 # III. Video hướng dẫn  
+
+<p align="center">
+<p align="center">
+    <a href="https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde"><img src="https://img.shields.io/badge/Kết_nối-SQL_Server%20bằng_sa-7289da.svg?sanitize=true" alt="Chat"></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-dfd.svg"></a>
+    <a href="https://github.com/PaddlePaddle/PaddleOCR/releases"><img src="https://img.shields.io/github/v/release/PaddlePaddle/PaddleOCR?color=ffa"></a>
+    <a href=""><img src="https://img.shields.io/badge/python-3.7+-aff.svg"></a>
+    <a href=""><img src="https://img.shields.io/badge/os-linux%2C%20win%2C%20mac-pink.svg"></a>
+    <a href="https://pypi.org/project/PaddleOCR/"><img src="https://img.shields.io/pypi/dm/PaddleOCR?color=9cf"></a>
+    <a href="https://github.com/PaddlePaddle/PaddleOCR/stargazers"><img src="https://img.shields.io/github/stars/PaddlePaddle/PaddleOCR?color=ccf"></a>
+</p>
+
+<div align="center">
+    <img src="https://github.com/PaddlePaddle/PaddleOCR/releases/download/v2.8.0/demo.gif" width="800">
+</div>
+
+
+<img alt="Static Badge" src="https://img.shields.io/badge/hello%20wolrd">
+
 
 Cách kết nối SQL Server với bằng tài khoản sa: [youtube](https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde)  
 Cách tạo môi trường ảo để làm việc không ảnh hưởng đến hệ thống: [youtube](https://youtu.be/FnqKNUp4Htg?si=gEbdzVxHgHajw9V6)  
