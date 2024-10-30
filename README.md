@@ -924,7 +924,7 @@ Xem thêm ví dụ [tại đây](models/setup_yolo_model.py)
 Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR), là một công cụ khá là mạnh mẽ và nhẹ, rất dễ dàng sử dụng nên nó sẽ là lựa chọn đầu tiên của mình.  
 
 <p align="center">
- <img src="https://github.com/PaddlePaddle/PaddleOCR/releases/download/v2.8.0/PaddleOCR_logo.png" align="middle" width = "600"/>
+ <img src="image_github/PaddleOCR_logo.png" align="middle" width = "600"/>
 </p>
 
 
@@ -932,7 +932,7 @@ Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/
 
 <p align="center">
 <p align="center">
-    <a href="https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde"><img src="https://img.shields.io/badge/Kết_nối-SQL_Server%20bằng_sa-7289da.svg?sanitize=true" alt="Chat"></a>
+    <a href="https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde"><img src="https://img.shields.io/badge/Kết_nối-SQL_Server_bằng_sa-7289da.svg?sanitize=true" alt="Chat"></a>
     <a href="./LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-dfd.svg"></a>
     <a href="https://github.com/PaddlePaddle/PaddleOCR/releases"><img src="https://img.shields.io/github/v/release/PaddlePaddle/PaddleOCR?color=ffa"></a>
     <a href=""><img src="https://img.shields.io/badge/python-3.7+-aff.svg"></a>
@@ -942,11 +942,8 @@ Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/
 </p>
 
 <div align="center">
-    <img src="https://github.com/PaddlePaddle/PaddleOCR/releases/download/v2.8.0/demo.gif" width="800">
+    <img src="https://giphy.com/embed/G5MDBwmdTrVMpuRJix" width="800">
 </div>
-
-
-<img alt="Static Badge" src="https://img.shields.io/badge/hello%20wolrd">
 
 
 Cách kết nối SQL Server với bằng tài khoản sa: [youtube](https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde)  
