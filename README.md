@@ -847,7 +847,47 @@ if __name__ == "__main__":
 ```
 > Phải để tất cả câu lệnh huấn luyện trong if __name__ == "__main__" thì nó mới hoạt động  
 
-Thư mục data chứa data.yaml được cấu hình dựa theo khuôn mẫu có sẵn, có thể sử dụng `ROBOFLOW` để gắn nhãn hình ảnh và tải về tệp dữ liệu này, tuy nhiên cần có 1 lưu ý với tệp `data.yaml` là phải chình sửa đường dẫn đến thư mục hình ảnh một cách chính xác.  
+Để chuẩn bị dữ liệu cho huấn luyện model ta sử dụng `roboflow`. Đầu tiên cần thu thập các hình ảnh có chứa về đối tượng ta cần `nhận diện`, `phân loại`, ... như của mình là nhận diện biển số xe nên sẽ thu thập các hình ảnh chứa biển số xe.  
+
+![image](assets/image/image_test/LÀN%20VÀO%2052019_12_07_13_29_47.jpg)
+
+Để mô hình có kết quả tốt nhất thì thu thập càng nhiều hình ảnh càng tốt, sau đó lên trang chủ `roboflow` tải các hình ảnh lên vào thư mục của bản thân.  
+
+![tải ảnh lên roboflow](image_github/upload_image.png)
+
+Khi tất cả hình ảnh đã được tải lên thì nó sẽ hỏi ta là muốn lựa chọn cách gắn nhãn như nào, sử dụng AI tự động hoặc thủ công, ta sẽ chọn `Start manual labeling`  
+
+![gắn nhãn thủ công](image_github/start_manual_label.png)
+
+Và chọn mời thêm các thành viên khác để gắn nhãn cho nhanh hoặc tự gắn nhãn một mình và sau đó chọn `Assign to Myself` để bắt đầu quá trình gắn nhẵn cực mất thời gian  
+
+![mời thành viên gắn nhãn hoặc không](image_github/invite_team.png)
+
+Sau khi upload hình ảnh lên thì ta tiến hành gắn nhãn cho các hình ảnh đó, có nghĩa là xác định vị trí các đối tượng trong hình ảnh, để nói cho model biết rằng biển số xe nằm ở đâu, để nó có thể học được, còn không gắn nhãn thì không khác gì vứt cho model 1 quyển sách mà ko nói cho nó biết nó nên học cái gì, và cái gì đúng cái gì sai trong cuốn sách đó.  
+
+![gắn nhãn hình ảnh](image_github/start_annotating.png)
+
+Ta phải cố gắng làm sao cho các vị trí đường viền (bounding box) đúng với vị trí của vật thể nhất có thể, sau đó chọn nhãn cho vật thể và tiếp tục với các hình ảnh còn lại.  
+
+![gắn nhãn](image_github/annotation.png)
+
+Sau khi gắn nhãn xong ta sẽ vào mục `Generate` để tạo bộ dữ liệu với các thông số như có xoay hình ảnh không, cắt hình ảnh, ... để tạo thêm dữ liệu từ dữ liệu gốc, nhằm mục đích gia tăng dữ liệu. Tuy nhiên phải chọn cách gia tăng hợp lý, ví dụ như biển số xe thì không được chọn `lật hình ảnh` vì không có ai mang biển số ngược cả, vậy nên phỉa chọn hợp lý.  
+
+![tăng cường dữ liệu](image_github/generate_image.png)
+
+Sau đó ấn create để tạo dữ liệu mới dựa trên dữ liệu gốc ban đầu. Khi đã có dữ liệu thì ta phải tải nó về để huấn luyện, để tải dữ liệu về thì các bạn vào mục `version` bên dưới `generate` và ấn `download dataset`. Lưu ý nhớ chọn format cho dữ liệu, mỗi một mô hình sẽ có 1 kiểu dữ liệu yêu cầu riêng nên phải chọn đúng mô hình bạn mong muốn.  
+
+![alt text](image_github/format_dataset.png)
+
+Các bạn có thể chọn nhiều loại dataset cho nhiều mô hình khác nhau, của mình sử dụng yolo v11 nên sẽ để định dạng dữ liệu là yolov11. Sau đó chọn tệp tin tải về là `zip` và nhấn tải về.  
+
+![alt text](image_github/download_dataset.png)
+
+Sau khi tải về thì ta sẽ giải nén nó ra và có cấu trúc thư mục như sau:  
+
+![alt text](image_github/tree_dataset.png)
+
+Tuy nhiên cần có 1 lưu ý với tệp `data.yaml` là phải chỉnh sửa đường dẫn đến thư mục hình ảnh một cách chính xác.  
 
 ```yaml
 train: D:/Project/SmartParkingServer/assets/License_plate_VN/train/images
@@ -864,7 +904,7 @@ roboflow:
   license: CC BY 4.0
   url: https://universe.roboflow.com/keo-keo/license-plate-vn-w6rqa/dataset/1
 ```
-Ta có thể thấy 3 thưu mục `train`, `valid`, `test` mình đã chỉnh sửa cho nó đường dẫn tuyệt đối.  
+Ta có thể thấy 3 thư mục `train`, `valid`, `test` mình đã chỉnh sửa cho nó đường dẫn tuyệt đối.  
 Sau khi ta huấn luyện mà mô hình chưa tốt, muốn huấn luyện thêm lần nữa với dữ liệu mới nhưng vẫn đảm bảo được dữ liệu cũ thì ta sử dụng tham số `resume = True` như sau:  
 
 ```python
@@ -882,4 +922,9 @@ Xem thêm ví dụ [tại đây](models/setup_yolo_model.py)
 ### 2. PaddleOCR
 
 ### 3. Video hướng dẫn  
-Chi tiết về video hướng dẫn cụ thể có thể truy cập [youtube hướng dẫn sử dụng AI với GPU](https://youtu.be/cI1MAaNQ560?si=Aup1YxdS5XhLjdCz)
+
+Cách kết nối SQL Server với bằng tài khoản sa: [youtube](https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde) 
+Cách tạo môi trường ảo để làm việc không ảnh hưởng đến hệ thống: [youtube](https://youtu.be/FnqKNUp4Htg?si=gEbdzVxHgHajw9V6)
+Cách huấn luyện mô hình yolo bằng python với Visual studio code: [youtube](https://youtu.be/QBbAIIomoGM?si=HgGa5yrfTihq-KOR)
+Cách để sử dụng GPU cho các mô hình AI: [youtube](https://youtu.be/cI1MAaNQ560?si=Aup1YxdS5XhLjdCz)
+Cách sử dụng Paddle OCR: [youtube](https://youtu.be/PtgXJvPS0E8?si=XXoBuXJXuYoCM7IR)
