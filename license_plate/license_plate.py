@@ -140,7 +140,7 @@ def predict(image, image2, save=True):
     is_license_plate= False   #default
     license_plate = "Không thấy biển số"   #default
     img_path = "None"    #default
-    license_plate_crop = cv2.imread("assets\\image\\img_src\\error_cross.png")
+    license_plate_crop = cv2.imread("assets\\image\\img_src\\not_found_license_plate.png")
 
     image = check_image(image=image)
     image2 = check_image(image=image2)

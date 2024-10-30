@@ -25,6 +25,7 @@
 - [4. Triển khai API với model AI](#4-triển-khai-api-với-model-ai)
     - [1. Yolo model](#1-yolo-model)
     - [2. PaddleOCR](#2-paddleocr)
+    - [3. Kết hợp AI vào FastAPI](#3-kết-hợp-ai-vào-fastapi)
 
 [III. Video hướng dẫn](#iii-video-hướng-dẫn)
 
@@ -927,7 +928,7 @@ Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/
  <img src="image_github/PaddleOCR_logo.png" align="middle" width = "600"/>
 </p>
 
-Các bạn có thể sử dụng `PAddleOCR` bằng `CPU` hoặc `GPU`. Với CPU các bạn chỉ cần làm theo đơn giản như những hướng dẫn tại [trang chủ](https://paddlepaddle.github.io/PaddleOCR/latest/en/quick_start.html) hoặc tại phần [video hướng dẫn](#iii-video-hướng-dẫn) mình để bên dưới.  
+Các bạn có thể sử dụng `PaddleOCR` bằng `CPU` hoặc `GPU`. Với CPU các bạn chỉ cần làm theo đơn giản như những hướng dẫn tại [trang chủ](https://paddlepaddle.github.io/PaddleOCR/latest/en/quick_start.html) hoặc tại phần [video hướng dẫn](#iii-video-hướng-dẫn) mình để bên dưới.  
 
 Cài đặt `PaddleOCR CPU`:  
 
@@ -935,7 +936,7 @@ Cài đặt `PaddleOCR CPU`:
 pip install paddlepaddle
 pip install "paddleocr>=2.0.1"
 ```
-Sau đó để sử dụng thì các bạn chỉ cần truyền vào đường dẫn hình ảnh cần độc ký tự:  
+Sau đó để sử dụng thì các bạn chỉ cần truyền vào đường dẫn hình ảnh cần đọc ký tự:  
 
 ```python
 from paddleocr import PaddleOCR, draw_ocr
@@ -965,7 +966,7 @@ im_show.save('result.jpg')
 Để có `font_path` thì các bạn có thể tải về [tại đây](assets/font/simfang.ttf) hoặc vào trang chủ `paddleocr/doc/font` và tải nó về
 
 Còn đối với GPU thì các bạn cần tải `paddlepadlle-gpu` để `paddleocr` có thể nhận ra được gpu trên máy tính của bạn. Vì mình sử dụng đồng thời `yolo gpu` và `paddleocr gpu` nên hiện tại `20/10/2024` cả 2 phiên bản xung đột với nhau, cần cài bản thấp hơn để nó có thể tương thích. Để cả hai tương thích với nhau thì ta cài `paddlepadlle-gpu` phiên bản `2.4.2 cuda 11.7`.  
-Đầu tiên các bạn cần tải `cudnn` từ trang chủ nvidia, lưu ý tải cundnn phù hợp với cuda. Vì cuda của mình là 11.7 nên mình sẽ tải cudnn dành cho phiên bản cuda 11.  
+Đầu tiên các bạn cần tải `cudnn` từ trang chủ nvidia, lưu ý tải cudnn phù hợp với cuda. Vì cuda của mình là 11.7 nên mình sẽ tải cudnn dành cho phiên bản cuda 11.  
 
 ![alt text](image_github/cudnn_for_cuda11.png)
 
@@ -1028,10 +1029,10 @@ ocr = PaddleOCR(
 ```
 Trong đó:  
 
-> use_angle_cls=False là không sửu dụng chức năng phân loại  
+> use_angle_cls=False là không sử dụng chức năng quay ảnh, là ảnh lật 180 độ vẫn đọc được nhưng nếu ảnh của bạn không quay 180 độ thì nên tắt để nhanh hơn  
 > lang='ch' là ngôn ngữ tiếng Trung  
 > show_log=False là không hiển thị log  
-> use_gpu=True là có sử dụng GPU
+> use_gpu=True là có sử dụng GPU  
 > rec_model_dir: đường dẫn recognition model là mô hình nhận dạng ký tự (Đọc các ký tự)  
 > det_model_dir: đường dẫn detection model là mô hình nhận diện ký tự (Phát hiện vùng nào có các ký tự)  
 > cls_model_dir: đường dẫn classification model là phân loại ký tự (Phân loại nó theo các nhóm)
@@ -1053,7 +1054,7 @@ Mặc định nó sẽ vừa nhận diện, nhận dạng, phân loại thì k�
 
 > [[[442.0, 173.0], [1169.0, 173.0], [1169.0, 225.0], [442.0, 225.0]], ['This is text from image', 0.99283075]]  
 
-Bao gồm các `bounding box` chứa tọa độ của vị trí chứa ký tự, kèm theo là `ký tự đọc được` và `xác xuất` cho nó à bao nhiêu phần trăm  
+Bao gồm các `bounding box` chứa tọa độ của vị trí chứa ký tự, kèm theo là `ký tự đọc được` và `xác xuất` cho nó là bao nhiêu phần trăm  
 
 Nếu sử dụng:  
 ```python
@@ -1139,7 +1140,7 @@ Vào trang chủ `paddleocr` và vào mục model để xem danh sách các mode
 
 ![alt text](image_github/list_model_paddleocr.png)
 
-Có 3 loại modle đã nêu ở trên chúng ta cần tải về như sau: `detection model`, `Recognition Model` và `Angle Classification Model`. Nếu văn bản của các bạn không xoay 180 độ thì không cần `Angle Classification Model`, việc bỏ nó sẽ giúp tăng hiệu suất.  
+Có 3 loại model đã nêu ở trên chúng ta cần tải về như sau: `detection model`, `Recognition Model` và `Angle Classification Model`. Nếu văn bản của các bạn không xoay 180 độ thì không cần `Angle Classification Model`, việc bỏ nó sẽ giúp tăng hiệu suất.  
 
 ![alt text](image_github/detection_paddleocr.png)
 
@@ -1169,6 +1170,89 @@ result_license_plate= ocrEngine.ocr(license_plate_crop, cls=False)[0]
 ```
 ##
 
+### 3. Kết hợp AI vào FastAPI
+
+Đối với dự án nhận dạng biển số xe, thì đầu tiên ta cần nhận diện biển số xe từ hình ảnh trước  
+
+![image](data/license_plate/29-10-24/29-X7485.17/background_2024-10-29-08-04-09.png)
+
+Sau đó ta sẽ cắt hình ảnh biển số từ hình ảnh gốc ban đầu để thu nhỏ phạm vi đọc text.  
+
+![image](data/license_plate/29-10-24/29-X7485.17/29-X7485172024-10-29-08-04-09.png)
+
+Sau khi cắt được phạm vi biển số thì có thể coi như ta đã loại bỏ được 90% nhiễu đến từ ngoại quan nằm trong bức hình ban đầu. Tiếp theo ta đưa hình ảnh đã cắt này vào `paddleocr` để đọc các ký tự nằm trên biển số. Rồi định dạng lại các ký tự cho đúng với biển số xe Việt Nam.  
+
+#### Nhận diện biển số bằng yolo
+
+Để nhận diện được biển số thì ta sẽ sử dụng mô hình `yolo` mà ta đã huấn luyện với dữ liệu chứa biển số từ trước. Ta cần khai báo `yolo` chạy với GPU để tối ưu hóa thời gian cho một quá trình.  
+Ta khai báo mô hình một lần, các lần sau sẽ không cần nữa, nó sẽ được lưu vào bộ nhớ RAM. Ta khai báo và tải `yolo` vào gpu [tại đây](models/yolo_model.py).  
+Sau khi tải mô hình yolo lên RAM thì ta sẽ tiến hành nhận diện biển số từ hình ảnh được gửi đến.  
+```python
+def predict(image, image2, save=True):
+    
+    is_license_plate= False   #default
+    license_plate = "Không thấy biển số"   #default
+    img_path = "None"    #default
+    license_plate_crop = cv2.imread("assets\\image\\img_src\\not_found_license_plate.png") #default
+
+    image = check_image(image=image)
+    image2 = check_image(image=image2)
+    # phát hiện khu vực có biển số, max_det là số lượng đối tượng phát hiện trên mỗi hình ảnh(max 300)
+    results= license_plate_detect_gpu(image, max_det = 1)[0]
+```
+
+Đầu vào của chúng ta là 2 hình ảnh, boa gồm hình ảnh có chứa biển số xe, hình ảnh thứ 2 là hình ảnh khuôn mặt của người lái. Ta cũng cần kiểm tra xem khi người dùng gửi 2 hình ảnh đến api thì chắc chắn nó là hình ảnh, nếu người dùng gửi file txt, ptpx hay các tệp tin khác có thể gây lỗi đến server. Vì vậy ta cần thêm một hàm kiểm tra đầu vào là gì [tại đây](file/check_image.py).  
+
+Việc mô hình có nhận diện được biển số hay không còn phụ thuộc vào nhiều yếu tố, thứ nhất là hình ảnh đầu vào, hình ảnh đầu vào phải chứa biển số, không bị các vật khác che mất, thứ 2 là mô hình yolo của bạn phải tốt.  
+
+Sau khi nhận diện được biển số, ta sẽ có vị trí của bounding box (hộp giới hạn bao quanh biển số), ta sẽ cắt hình ảnh theo các vị trí đó để thu được hình ảnh biển số và đưa nó vào mô hình paddleocr để tiến hành đọc biển số.  
+
+```python
+# Trích xuất vị trí bounding box, là vị trí tọa độ chứa biển số
+boxes = results.boxes.xyxy.tolist()
+
+for i, box in enumerate(boxes):
+    # lấy tọa độ (x1,y1) trên cùng bên trái và (x2,y2) cuối cùng bên phải
+    x1, y1, x2, y2 = box
+
+    # Cắt khu vực chứa biển số để đưa vào paddleocr
+    license_plate_crop = image[int(y1):int(y2), int(x1):int(x2)]
+```
+
+### Đọc biển số bằng paddleocr
+
+Sau khi có được hình ảnh chỉ có mỗi biển số thì ta tiến hành đọc biển số bằng OCR.  
+
+```python
+def get_license_plate(license_plate_crop):
+
+    is_license_plate = False
+
+
+    # Đọc tất cả các ký tự chứa trong hình ảnh
+    # sử dụng cls khi văn bản có góc xoay 180 độ, nếu không có văn bản nào 180 độ thì nên đặt False để tăng hiệu suất
+    result_license_plate= ocrEngine.ocr(license_plate_crop, cls=False)[0]
+```
+
+Sau khi đọc các ký tự nằm trên biển số thì ta phải định dạng nó lại cho phù hợp với biển số xe Việt Nam như sau:  
+
+```python
+if result_license_plate:
+    # print(f"Các ký tự đọc được từ hình ảnh: {result_license_plate}")
+    # Ghép từng ký tự ở hai hàng của biển số lại với nhau: 38-F7
+                                                        # 390.01
+    license_plate = [line[1][0] for line in result_license_plate]
+
+    # Viết hoa các chữ cái, bỏ các khoảng trắng
+    license_plate = [i.upper() for i in license_plate]
+    license_plate =''.join(license_plate)
+    # print(f"Các ký tự sau khi loại bỏ khoảng trắng và ghép lại: {license_plate}")
+
+    # Định dạng lại tất cả ký tự xem nó có phải là biển số không, ví dụ: 38-F2 123456 thì nó thừa rất nhiều số, nên sẽ ko coi nó là biển số
+    is_license_plate, license_plate=license_complies_format(license_plate)
+```
+
+Xem ví dụ cụ thể [tại đây](license_plate/license_plate.py)
 # III. Video hướng dẫn  
 
 <p align="center">
