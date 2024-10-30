@@ -25,9 +25,8 @@
 - [4. Triển khai API với model AI](#4-triển-khai-api-với-model-ai)
     - [1. Yolo model](#1-yolo-model)
     - [2. PaddleOCR](#2-paddleocr)
-    - [3. Video hướng dẫn](#3-video-hướng-dẫn)
 
-[III. Kết thúc](#iii-kết-thúc)
+[III. Video hướng dẫn](#iii-video-hướng-dẫn)
 
 # I. FastAPI
 
@@ -871,7 +870,7 @@ Ta phải cố gắng làm sao cho các vị trí đường viền (bounding box
 
 ![gắn nhãn](image_github/annotation.png)
 
-Sau khi gắn nhãn xong ta sẽ vào mục `Generate` để tạo bộ dữ liệu với các thông số như có xoay hình ảnh không, cắt hình ảnh, ... để tạo thêm dữ liệu từ dữ liệu gốc, nhằm mục đích gia tăng dữ liệu. Tuy nhiên phải chọn cách gia tăng hợp lý, ví dụ như biển số xe thì không được chọn `lật hình ảnh` vì không có ai mang biển số ngược cả, vậy nên phỉa chọn hợp lý.  
+Sau khi gắn nhãn xong ta sẽ vào mục `Generate` để tạo bộ dữ liệu với các thông số như có xoay hình ảnh không, cắt hình ảnh, ... để tạo thêm dữ liệu từ dữ liệu gốc, nhằm mục đích gia tăng dữ liệu. Tuy nhiên phải chọn cách gia tăng hợp lý, ví dụ như biển số xe thì không được chọn `lật hình ảnh` vì không có ai mang biển số ngược cả, vậy nên phải chọn hợp lý.  
 
 ![tăng cường dữ liệu](image_github/generate_image.png)
 
@@ -914,17 +913,16 @@ from ultralytics import YOLO
 model = YOLO("path/to/last.pt")  # load a partially trained model
 
 # Resume training
-results = model.train(resume=True)
+results = model.train(data="assets\\License_plate_VN\\data.yaml", resume=True)
 ```
 
 Ta sẽ tải lại mô hình đã huấn luyện và huấn luyện dựa theo các thông số cũ đã được lưu.  
 Xem thêm ví dụ [tại đây](models/setup_yolo_model.py)
 ### 2. PaddleOCR
 
-### 3. Video hướng dẫn  
+# III. Video hướng dẫn  
 
-Cách kết nối SQL Server với bằng tài khoản sa: [youtube](https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde) 
-Cách tạo môi trường ảo để làm việc không ảnh hưởng đến hệ thống: [youtube](https://youtu.be/FnqKNUp4Htg?si=gEbdzVxHgHajw9V6)
-Cách huấn luyện mô hình yolo bằng python với Visual studio code: [youtube](https://youtu.be/QBbAIIomoGM?si=HgGa5yrfTihq-KOR)
-Cách để sử dụng GPU cho các mô hình AI: [youtube](https://youtu.be/cI1MAaNQ560?si=Aup1YxdS5XhLjdCz)
-Cách sử dụng Paddle OCR: [youtube](https://youtu.be/PtgXJvPS0E8?si=XXoBuXJXuYoCM7IR)
+Cách kết nối SQL Server với bằng tài khoản sa: [youtube](https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde)  
+Cách tạo môi trường ảo để làm việc không ảnh hưởng đến hệ thống: [youtube](https://youtu.be/FnqKNUp4Htg?si=gEbdzVxHgHajw9V6)  
+Cách huấn luyện mô hình yolo bằng python với Visual studio code: [youtube](https://youtu.be/QBbAIIomoGM?si=HgGa5yrfTihq-KOR)  
+Cách để sử dụng GPU cho các mô hình AI: [youtube](https://youtu.be/cI1MAaNQ560?si=Aup1YxdS5XhLjdCz)  
