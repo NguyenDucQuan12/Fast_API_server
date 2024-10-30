@@ -934,7 +934,7 @@ Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/
 <p align="center">
     <a href="https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde"><img src="https://img.shields.io/badge/Kết_nối-SQL_Server_bằng_sa-7289da.svg?sanitize=true"></a>
     <a href="https://youtu.be/FnqKNUp4Htg?si=gEbdzVxHgHajw9V6"><img src="https://img.shields.io/badge/Môi_trường_ảo-Python-8A2BE2.svg?sanitize=true"></a>
-    <a href="https://youtu.be/QBbAIIomoGM?si=HgGa5yrfTihq-KOR"><img src="https://img.shields.io/badge/Huấn_luyện_yolo-Visual_studio_code?sanitize=true?color=ffa"></a>
+    <a href="https://youtu.be/QBbAIIomoGM?si=HgGa5yrfTihq-KOR"><img src="https://img.shields.io/badge/Huấn_luyện_yolo-Visual_studio_code?sanitize=true"></a>
     <a href="https://youtu.be/cI1MAaNQ560?si=Aup1YxdS5XhLjdCz"><img src="https://img.shields.io/badge/GPU-cho_các_model_AI-7289da?sanitize=true"></a>
     <a href="./LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-dfd.svg"></a>
     <a href=""><img src="https://img.shields.io/github/v/release/NguyenDucQuan12/Fast_API_server?color=ffa"></a>
