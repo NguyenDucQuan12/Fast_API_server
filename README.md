@@ -1252,7 +1252,78 @@ if result_license_plate:
     is_license_plate, license_plate=license_complies_format(license_plate)
 ```
 
-Xem ví dụ cụ thể [tại đây](license_plate/license_plate.py)
+Xem ví dụ cụ thể [tại đây](license_plate/license_plate.py)  
+
+### Tạo api gửi hình ảnh và nhận kết quả là biển số
+
+Sau khi ta đã tạo được hàm đọc biển số thì ta cần taojo 1 api, khi gọi api thì nó sẽ gọi hàm nhận diện biển số và trả về kết quả text cho người gọi api.  
+
+```python
+router = APIRouter(
+    prefix="/license_plate",
+    tags=["license_plate"]
+)
+
+
+@router.post("/detect")
+def get_license_plate_number(image: UploadFile = File(...), image2: UploadFile = File(...)):
+
+    # Tạo tên tệp duy nhất cho mỗi yêu cầu API
+    unique_id = str(uuid.uuid4())
+    license_plate_frame = f"license_plate_image_{unique_id}.png"
+    face_frame = f"face_image_{unique_id}.png"
+
+    # Hoặc có thể sử dụng thư mục tạm thời
+    temp_dir = tempfile.gettempdir()
+    license_plate_frame_path = os.path.join(temp_dir, license_plate_frame)
+    face_frame_path = os.path.join(temp_dir, face_frame)
+
+    try:
+        # Sử dụng with để đảm bảo tệp được đóng đúng cách sau khi xử lý xong
+        with open(license_plate_frame_path, "w+b") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+        
+        with open(face_frame_path, "w+b") as buffer:
+            shutil.copyfileobj(image2.file, buffer)
+
+        # Đóng file upload ngay sau khi không sử dụng nữa
+        image.file.close()
+        image2.file.close()
+
+        # Gọi hàm predict để xử lý ảnh
+        result = predict(image=license_plate_frame_path, image2 = face_frame_path)
+    
+    finally:
+        # Dọn dẹp tài nguyên sau khi xử lý
+        # Xóa tệp tạm thời nếu cần, đảm bảo tệp ảnh không lưu lại trên hệ thống
+        if os.path.exists(license_plate_frame_path):
+            os.remove(license_plate_frame_path)
+        if os.path.exists(face_frame_path):
+            os.remove(face_frame_path)
+        
+        # Thu hồi bộ nhớ không cần thiết
+        # gc.collect()
+
+    return result
+
+```
+
+Khi nhận tệp hình ảnh từ người dùng, thay vì lưu hình ảnh vào bộ nhớ xong sau đó gọi hình ảnh đã lưu thì ta sẽ tạo 1 tệp tạm thời để chứa hình ảnh từ người dùng:  
+
+```python
+# Tạo tên tệp duy nhất cho mỗi yêu cầu API
+unique_id = str(uuid.uuid4())
+license_plate_frame = f"license_plate_image_{unique_id}.png"
+face_frame = f"face_image_{unique_id}.png"
+
+# Hoặc có thể sử dụng thư mục tạm thời
+temp_dir = tempfile.gettempdir()
+license_plate_frame_path = os.path.join(temp_dir, license_plate_frame)
+face_frame_path = os.path.join(temp_dir, face_frame)
+```
+Ta sử dụng hình ảnh tạm thời này để đưa vào hàm nhận diện biển số `predict` nhưu hai hình ảnh, và sau khi sử dụng xong thì ta phải xóa các thư mục hay tệp tin tạm thời này để tránh việc rò rỉ bộ nhớ không đáng có. Vậy alf ta đã tạo api cho người dùng với địa chỉ:  
+`http://192.168.0.100:8000/license_plate/detect`  
+Xem ví dụ cụ thể [tại đây](router/license_plate_router.py)
 # III. Video hướng dẫn  
 
 <p align="center">
