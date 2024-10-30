@@ -23,6 +23,9 @@
   - [2. Yêu cầu xác thực khi gọi api](#2-yêu-cầu-xác-thực-khi-gọi-api)
 
 - [4. Triển khai API với model AI](#4-triển-khai-api-với-model-ai)
+    - [1. Yolo model](#1-yolo-model)
+    - [2. PaddleOCR](#2-paddleocr)
+    - [3. Video hướng dẫn](#3-video-hướng-dẫn)
 
 [III. Kết thúc](#iii-kết-thúc)
 
@@ -131,6 +134,7 @@ engine = create_engine(
     connection_url
 )
 ```
+Để biết thêm cách cho phép tài khoản `sa` có thể truy cập từ xa, hay remote SQL Server thì xem thêm tại [youtube cách remote SQL Server](https://youtu.be/NJYRgKpKePQ?si=JvDe-urxTRwOpm-Q)
 Xem ví dụ cụ thể [tại đây](db/database.py)  
 
 ### 2. Tạo bảng dữ liệu  
@@ -728,3 +732,154 @@ Bước 2: Gọi api cần xác thực đi kèm với đó là `token` đã lấ
 Xem ví dụ cụ thể [tại đây](router/employee_router.py)  
 
 ## 4. Triển khai API với model AI
+
+Cách triển khai các model AI với API. Ta sẽ đưa các mô hình này lên server, và các chương trình khác sẽ gọi nó thông qua api. Quy trình như sau:  
+
+> Các máy muốn sử dụng AI sẽ gọi đến api kèm theo là hình ảnh (đầu vào của model), sau đó trên server sẽ nhận hình ảnh đấy và bắt đầu xử lý. Sau khi xử lý xong thì trả kết quả về cho máy đã goi api.  
+
+Với 4 máy muốn sử dụng AI thì cả 4 máy chỉ cần gọi API tới máy chủ, và máy chủ sẽ trả về kết quả. Thay vì phải build cho cả 4 máy đều có cấu hình mạnh thì ta chỉ cần build một máy chủ có cấu hình mạnh là được. Các máy còn lại gọi api thì không cần có cấu hình quá cao.  
+Trước tiên ta cần chuẩn bị sẵn model đã được huấn luyện. Với yolo thì các bạn sẽ có 1 file `your_model.pt` và `paddleocr` sẽ có các thư mục tương ứng.  
+
+![alt text](image_github/tree_model.png)  
+
+### 1. Yolo model
+Cài đặt thư viện `ultralytics` bằng câu lệnh `pip`:  
+
+```python
+pip install ultralytics
+```
+Để tải về model đã được huấn luyện sẵn từ nhóm `ultralytics` ta sử dụng câu lệnh:  
+
+```python 
+from ultralytics import YOLO
+# Load a pretrained YOLO model (recommended for training)
+model = YOLO("yolo11n.pt")
+```
+Việc lựa chọn kích thước model: `nano`, `small`, `medium`, ... tùy thuộc như cầu của bạn, các mô hình lớn sẽ cho kết quả tốt hơn, nhưng đi kèm theo đó là hình ảnh đầu vào phải chất lượng, thời gian tính toán xử lý sẽ lâu hơn, các mô hình bé hơn thì sẽ cho thời gian suy luận ngắn hơn nhưng kết quả có thể không chính xác bằng các mô hình lớn hơn. Vì vậy bạn cần lựa chọn mô hình nào là tùy thuộc vào việc bạn đánh đổi thời gian suy luận với kết quả suy luận của mô hình.  
+
+![alt text](image_github/yolo_model_size.png)
+
+Các bạn cũng có thể thấy ở cột `speed` có 2 cột là `CPU` và `GPU` thì sự khác biệt rất lớn. Vì vậy chúng ta sẽ cố gắng sử dụng các model của chúng ta trên GPU để cải thiện tốc độ suy luận tốt nhất.  
+Các bạn có thể dùng model có sẵn từ `ultralytics` hoặc huấn luyện lại nó. Cuối cùng sẽ được một tệp tin có đuôi `.pt`.  
+Để sử dụng model thì ta cần khởi tạo nó lên bộ nhớ bằng câu lệnh sau.  
+
+```python 
+from ultralytics import YOLO
+
+license_plate_detect_gpu = YOLO('assets/model/yolo/yolov8_pretrain/best.pt')
+
+license_plate_detect_gpu.predict("image.png", save = True)
+```
+Tuy nhiên nó vẫn chỉ là sử dụng `CPU`, để sử dụng `GPU` thì ta cần cấu hình cho model của chúng ta nhận diện được `GPU trên máy tính`.  
+Đầu tiên máy tính của bạn phải có `GPU` đã. Để kiểm tra với các GPU của `nivida` thì gõ lệnh sau vào `terminal` hoặc `cmd`.  
+
+```
+nvidia-smi
+```
+Nếu có kết quả trả về thì máy tính của bạn có `GPU` và sang bước tiếp theo.  
+
+![alt text](image_github/nvidia-smi.png)
+
+Các bạn có thể nhìn thấy trên dòng đầu tiên của bảng có 2 thông tin `Driver Version: 552.74` và `CUDA Version: 12.4` thì đây có nghĩa là driver của bạn đang là phiên bản 552.74 và CUDA mà GPU của bạn hỗ trợ tối đa là 12.4. Bạn cần tải 2 cái này về. Và nó sẽ chứa thông tin về GPU, như của mình đang hiện là `Quadro P2000`.  
+Với Driver thì các bạn truy cập [vào đây](https://www.nvidia.com/en-us/drivers/), tiếp theo chọn các thông tin phù hợp với GPU của mình để tải driver.  
+
+![alt text](image_github/nivida_driver.png)
+
+Chọn `Find` và tải về phiên bản của bạn, sau đó cài đặt nó.  
+
+Sau đó đến lượt tải CUDA, các bạn gõ `cuda nvida` hoặc truy cập [cuda nvidia version](https://developer.nvidia.com/cuda-toolkit-archive) để tìm phiên bản CUDA phù hợp. GPU của mình hỗ trợ tối da `CUDA 12.4` nhưng không nhất thiết của phải tải `CUDA 12.4`. Phải tùy thuộc vào dự án đang chạy để tải `CUDA`, bởi vì `CUDA 12.4` vừa mới ra mắt, các modle AI còn chưa cập nhật được `CUDA mới` nên nếu tải CUDA mới sẽ không tương thích, cần phải đợi 1 thời gian nữa để các nhóm phát triển AI cập nhật `CUDA`. Vì vậy hiện tại `CUDA 11.7` sẽ là phiên bản tương thích nhất đối với các model AI `**Ngày 20/10/2024**`.  
+
+![alt text](image_github/CUDA117.png)
+
+Ta tải CUDA về và tiến hành cài đặt.  
+
+Sau khi khâu chuẩn bị đã xong thì ta cần làm cho phần mềm có thể nhận dạng được GPU trên máy tính. Ta sẽ sử dụng `Torch GPU`.  
+Để tìm được phiên bản `torch gpu` phù hợp với CUDA thì các bạn có thể xem [tại đây](https://pytorch.org/)  
+Tuy nhiên GPU của tôi có CUDA là 11.7 nên hiện tại nó không nằm ở đây, vì vậy tôi phải tìm các phiên bản cũ hơn. Và phiên bản cũ hơn thì cũng yêu cầu `python cũ`, python phù hợp với torch cuda 11.7 là `python 3.10`. Để cài torch gpu cuda 11.7 thì ta thực hiện các bước sau:  
+Đầu tiên cần gỡ cài đặt `torch cpu` trước:  
+
+```python
+python -m pip uninstall torch
+python -m pip cache purge
+```
+Sau đó cài đặt `torch gpu cuda 11.7`:  
+
+```python
+python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+```
+Sau khi cài đặt xong mà gặp lỗi `không tương thích với numpy` thì ta chỉ cần hạ cấp phiên bản `numpy` là được.  
+
+> A module that was compiled using NumPy 1.x cannot be run in NumPy 2.1.2 as it may crash. To support both 1.x and 2.x versions of NumPy, modules must be compiled with NumPy 2.0. Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+>If you are a user of the module, the easiest solution will be to downgrade to 'numpy<2' or try to upgrade the affected module. We expect that some modules will need time to support NumPy 2.
+
+Để cài đặt phiên bản numpy thấp hơn ta sử dụng:  
+
+```python 
+pip install "numpy<2.0"
+```
+Sau đó ta sẽ sử dụng torch như sau:  
+
+```python
+import torch
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f"Sử dụng {device}")
+```
+Nếu kết quả trả về là `Sử dụng cuda` thì chúc mừng bạn đã thành công. Và để đưa model `yolo` lên GPU thì dùng câu lệnh `to(device)`.  
+
+```python
+license_plate_detect_gpu = YOLO("assets\\model\\yolo\\yolov11_pretrain\\last.pt").to(device= device)
+```
+
+Xem ví dụ cụ thể [tại đây](models/yolo_model.py)  
+
+Việc huấn luyện model được thực hiện bằng trực tiếp dòng lệnh `python` trên máy của bạn, sử dụng `google colab` nếu máy của bạn không có GPU, tuy nhiên bạn sẽ huấn luyện được 1 lần là hết thời gian dùng GPU miễn phí trong 1 tuần.  
+Để sử dụng bằng `python` ta dùng câu lệnh như sau:  
+
+```python
+from ultralytics import YOLO
+
+if __name__ == "__main__":
+    # Load a model
+    model = YOLO("yolov11n")  # load a pretrained model (recommended for training)
+
+    # Train the model
+    results = model.train(data="assets\\License_plate_VN\\data.yaml", epochs=100, imgsz=640, device = 0)
+```
+> Phải để tất cả câu lệnh huấn luyện trong if __name__ == "__main__" thì nó mới hoạt động  
+
+Thư mục data chứa data.yaml được cấu hình dựa theo khuôn mẫu có sẵn, có thể sử dụng `ROBOFLOW` để gắn nhãn hình ảnh và tải về tệp dữ liệu này, tuy nhiên cần có 1 lưu ý với tệp `data.yaml` là phải chình sửa đường dẫn đến thư mục hình ảnh một cách chính xác.  
+
+```yaml
+train: D:/Project/SmartParkingServer/assets/License_plate_VN/train/images
+val: D:/Project/SmartParkingServer/assets/License_plate_VN/valid/images
+test: D:/Project/SmartParkingServer/assets/License_plate_VN/test/images
+
+nc: 1
+names: ['license-plate']
+
+roboflow:
+  workspace: keo-keo
+  project: license-plate-vn-w6rqa
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/keo-keo/license-plate-vn-w6rqa/dataset/1
+```
+Ta có thể thấy 3 thưu mục `train`, `valid`, `test` mình đã chỉnh sửa cho nó đường dẫn tuyệt đối.  
+Sau khi ta huấn luyện mà mô hình chưa tốt, muốn huấn luyện thêm lần nữa với dữ liệu mới nhưng vẫn đảm bảo được dữ liệu cũ thì ta sử dụng tham số `resume = True` như sau:  
+
+```python
+from ultralytics import YOLO
+
+# Load a model
+model = YOLO("path/to/last.pt")  # load a partially trained model
+
+# Resume training
+results = model.train(resume=True)
+```
+
+Ta sẽ tải lại mô hình đã huấn luyện và huấn luyện dựa theo các thông số cũ đã được lưu.  
+Xem thêm ví dụ [tại đây](models/setup_yolo_model.py)
+### 2. PaddleOCR
+
+### 3. Video hướng dẫn  
+Chi tiết về video hướng dẫn cụ thể có thể truy cập [youtube hướng dẫn sử dụng AI với GPU](https://youtu.be/cI1MAaNQ560?si=Aup1YxdS5XhLjdCz)
