@@ -920,7 +920,7 @@ Ta sẽ tải lại mô hình đã huấn luyện và huấn luyện dựa theo 
 Xem thêm ví dụ [tại đây](models/setup_yolo_model.py)
 ### 2. PaddleOCR
 
-Để đọc các ký tự trên hình ảnh thành các dòng text thì ta sửu dụng phương pháp `nhận diện quang học` hay còn gọi là `OCR`. Ta có nhiều mô hình có thể `OCR` như `VietOCR`, `easyOCR`, `VinOCR`, ...  
+Để đọc các ký tự trên hình ảnh thành các dòng text thì ta sử dụng phương pháp `nhận diện quang học` hay còn gọi là `OCR`. Ta có nhiều mô hình có thể `OCR` như `VietOCR`, `easyOCR`, `VinOCR`, ...  
 Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR), là một công cụ khá là mạnh mẽ và nhẹ, rất dễ dàng sử dụng nên nó sẽ là lựa chọn đầu tiên của mình.  
 
 <p align="center">
@@ -934,7 +934,7 @@ Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/
 <p align="center">
     <a href="https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde"><img src="https://img.shields.io/badge/Kết_nối-SQL_Server_bằng_sa-7289da.svg?sanitize=true"></a>
     <a href="https://youtu.be/FnqKNUp4Htg?si=gEbdzVxHgHajw9V6"><img src="https://img.shields.io/badge/Môi_trường_ảo-Python-8A2BE2.svg?sanitize=true"></a>
-    <a href="https://youtu.be/QBbAIIomoGM?si=HgGa5yrfTihq-KOR"><img src="https://img.shields.io/badge/Huấn_luyện_yolo-Visual_studio_code?color=ffa?sanitize=true"></a>
+    <a href="https://youtu.be/QBbAIIomoGM?si=HgGa5yrfTihq-KOR"><img src="https://img.shields.io/badge/Huấn_luyện_yolo-Visual_studio_code?color=ffa?"></a>
     <a href="https://youtu.be/cI1MAaNQ560?si=Aup1YxdS5XhLjdCz"><img src="https://img.shields.io/badge/GPU-cho_các_model_AI-7289da?sanitize=true"></a>
     <a href="./LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-dfd.svg"></a>
     <a href=""><img src="https://img.shields.io/github/v/release/NguyenDucQuan12/Fast_API_server?color=ffa"></a>
