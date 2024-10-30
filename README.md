@@ -934,7 +934,7 @@ Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/
 <p align="center">
     <a href="https://youtu.be/NJYRgKpKePQ?si=ocDiK0ruAk4BLqde"><img src="https://img.shields.io/badge/Kết_nối-SQL_Server_bằng_sa-7289da.svg?sanitize=true" alt="Chat"></a>
     <a href="./LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-dfd.svg"></a>
-    <a href="https://github.com/PaddlePaddle/PaddleOCR/releases"><img src="https://img.shields.io/github/v/release/PaddlePaddle/PaddleOCR?color=ffa"></a>
+    <a href="https://youtu.be/FnqKNUp4Htg?si=gEbdzVxHgHajw9V6"><img src="https://img.shields.io/github/v/release/NguyenDucQuan12/Fast_API_server?color=ffa"></a>
     <a href=""><img src="https://img.shields.io/badge/python-3.7+-aff.svg"></a>
     <a href=""><img src="https://img.shields.io/badge/os-linux%2C%20win%2C%20mac-pink.svg"></a>
     <a href="https://pypi.org/project/PaddleOCR/"><img src="https://img.shields.io/pypi/dm/PaddleOCR?color=9cf"></a>
@@ -942,7 +942,7 @@ Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/
 </p>
 
 <div align="center">
-    <img src="https://giphy.com/embed/G5MDBwmdTrVMpuRJix" width="800">
+    <img src="image_github/thank_gif.gif" width="800">
 </div>
 
 
