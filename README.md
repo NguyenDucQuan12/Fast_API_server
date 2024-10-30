@@ -927,6 +927,207 @@ Trong bài viết này mình hướng dẫn về [PaddleOCR](https://github.com/
  <img src="image_github/PaddleOCR_logo.png" align="middle" width = "600"/>
 </p>
 
+Các bạn có thể sử dụng `PAddleOCR` bằng `CPU` hoặc `GPU`. Với CPU các bạn chỉ cần làm theo đơn giản như những hướng dẫn tại [trang chủ](https://paddlepaddle.github.io/PaddleOCR/latest/en/quick_start.html) hoặc tại phần [video hướng dẫn](#iii-video-hướng-dẫn) mình để bên dưới.  
+
+Cài đặt `PaddleOCR CPU`:  
+
+```python
+pip install paddlepaddle
+pip install "paddleocr>=2.0.1"
+```
+Sau đó để sử dụng thì các bạn chỉ cần truyền vào đường dẫn hình ảnh cần độc ký tự:  
+
+```python
+from paddleocr import PaddleOCR, draw_ocr
+
+# Paddleocr supports Chinese, English, French, German, Korean and Japanese
+# You can set the parameter `lang` as `ch`, `en`, `french`, `german`, `korean`, `japan`
+# to switch the language model in order
+ocr = PaddleOCR(use_angle_cls=True, lang='en') # need to run only once to download and load model into memory
+img_path = 'PaddleOCR/doc/imgs_en/img_12.jpg'
+result = ocr.ocr(img_path, cls=True)
+for idx in range(len(result)):
+    res = result[idx]
+    for line in res:
+        print(line)
+
+# draw result
+from PIL import Image
+result = result[0]
+image = Image.open(img_path).convert('RGB')
+boxes = [line[0] for line in result]
+txts = [line[1][0] for line in result]
+scores = [line[1][1] for line in result]
+im_show = draw_ocr(image, boxes, txts, scores, font_path='/path/to/PaddleOCR/doc/fonts/simfang.ttf')
+im_show = Image.fromarray(im_show)
+im_show.save('result.jpg')
+```
+Để có `font_path` thì các bạn có thể tải về [tại đây](assets/font/simfang.ttf) hoặc vào trang chủ `paddleocr/doc/font` và tải nó về
+
+Còn đối với GPU thì các bạn cần tải `paddlepadlle-gpu` để `paddleocr` có thể nhận ra được gpu trên máy tính của bạn. Vì mình sử dụng đồng thời `yolo gpu` và `paddleocr gpu` nên hiện tại `20/10/2024` cả 2 phiên bản xung đột với nhau, cần cài bản thấp hơn để nó có thể tương thích. Để cả hai tương thích với nhau thì ta cài `paddlepadlle-gpu` phiên bản `2.4.2 cuda 11.7`.  
+Đầu tiên các bạn cần tải `cudnn` từ trang chủ nvidia, lưu ý tải cundnn phù hợp với cuda. Vì cuda của mình là 11.7 nên mình sẽ tải cudnn dành cho phiên bản cuda 11.  
+
+![alt text](image_github/cudnn_for_cuda11.png)
+
+Sau khi tải về và giải nén thư mục cudnn thì sẽ có các thư mục `bin`, ... Việc cần làm đó là sao chép các tệp đó vào từng thư mục tương ứng:  
+```
+C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.7\\xxx
+```
+![alt text](image_github/copy_cudnn_bin.png)
+
+![alt text](image_github/copy_cudnn_lib.png)
+
+
+Sau khi copy thì nhớ kiểm tra thêm lần nữa các đường dẫn đã được thêm `biến môi trường máy tính` chưa  
+
+![alt text](image_github/add_cuda_to_enviroment_variable.png)
+
+Sau khi đã hoàn thành thì vào [trang chủ paddlepaddle-gpu](https://www.paddlepaddle.org.cn/en/install/quick?docurl=/documentation/docs/en/install/pip/windows-pip_en.html) để tìm câu lệnh phù hợp với CUDA và phiên bản thích hợp.  
+
+![alt text](image_github/paddlepaddle_gpu.png)
+
+Tuy nhiên phiên bản mình cần tìm là `paddlepađle-gpu 2.4.2` nên sẽ sử dụng câu lệnh sau:  
+
+```python
+# Chỉ cso thể dùng với python 3.10
+python -m pip install paddlepaddle-gpu==2.4.2.post117 -f https://www.paddlepaddle.org.cn/whl/windows/mkl/avx/stable.html
+
+```
+Sau đó cài `paddleocr` như bình thường với câu lệnh:  
+
+```python
+pip install "paddleocr>=2.0.1" # Recommend to use version 2.0.1+
+```
+
+Sau đó chạy lệnh sau để kiểm tra xem đã cài thành công chưa bằng lệnh sau:  
+```python 
+import paddle
+
+# Kiểm tra xem paddle có nhận gpu không
+gpu_available  = paddle.device.is_compiled_with_cuda()
+print("GPU available:", gpu_available)
+
+```
+Nếu kết quả trả về `GPU available: True` thì có nghĩa đã có thể sử dụng `paddleocr-gpu`.  
+Xem thêm ví dụ cụ thể [tại đây](test/test_OCR_GPU.py)  
+
+Ta sử dụng paddleocr với gpu bằng câu lệnh sau.  
+
+```python
+from paddleocr import PaddleOCR
+# sử dụng PaddleOCR ngôn ngữ tiếng Trung
+ocrEngine = PaddleOCR(
+            use_angle_cls=False,
+            lang='ch',
+            show_log=False,
+            use_gpu=True,
+            rec_model_dir="assets/model/paddleocr/china/rec", # use in here
+            det_model_dir="assets/model/paddleocr/china/det", # use in here
+            cls_model_dir="assets/model/paddleocr/china/cls" # use in here
+        )
+```
+Trong đó:  
+
+> rec_model: recognition model là mô hình nhận dạng ký tự (Đọc các ký tự)  
+> det_mode: detection model là mô hình nhận diện ký tự (Phát hiện vùng nào có các ký tự)  
+> cls_model: classification model là phân loại ký tự (Phân loại nó theo các nhóm)
+
+```python
+# Khởi tạo mô hình ocr kèm theo cấu hình
+ocr = PaddleOCR(use_angle_cls=True, lang='en')
+# đường dẫn hình ảnh
+img_path = 'PaddleOCR/doc/imgs_words_en/word_10.png'
+# Tiếm hành đọc ký tự
+result = ocr.ocr(img_path, cls = True)
+#hiển thị kết quả
+for idx in range(len(result)):
+    res = result[idx]
+    for line in res:
+        print(line)
+```
+Mặc định nó sẽ vừa nhận diện, nhận dạng, phân loại thì kết quả sẽ như sau:  
+
+> [[[442.0, 173.0], [1169.0, 173.0], [1169.0, 225.0], [442.0, 225.0]], ['This is text from image', 0.99283075]]  
+
+Bao gồm các `bounding box` chứa tọa độ của vị trí chứa ký tự, kèm theo là `ký tự đọc được` và `xác xuất` cho nó à bao nhiêu phần trăm  
+
+Nếu sử dụng:  
+```python
+ocr = PaddleOCR(lang='en')
+img_path = 'PaddleOCR/doc/imgs_words_en/word_10.png'
+result = ocr.ocr(img_path, cls=False)
+```
+Sẽ chỉ nhận diện và nhận dạng, kêt quả thu được như sau:  
+
+> [[[442.0, 173.0], [1169.0, 173.0], [1169.0, 225.0], [442.0, 225.0]], ['ACKNOWLEDGEMENTS', 0.99283075]]
+
+Bao gồm các `bounding box` chứa tọa độ của vị trí chứa ký tự, kèm theo là `ký tự đọc được` và `xác xuất` cho nó à bao nhiêu phần trăm  
+
+Nếu sử dụng;  
+```python
+ocr = PaddleOCR(use_angle_cls=True, lang='en') # need to run only once to load model into memory
+img_path = 'PaddleOCR/doc/imgs_words_en/word_10.png'
+result = ocr.ocr(img_path, det=False, cls=True)
+```
+Sẽ chỉ phân loại và nhận dạng, kêt quả thu được như sau:  
+
+> ['PAIN', 0.990372]
+
+Chỉ có ký tự đọc được và xác xuất của nó.  
+
+Nếu sử dụng:  
+```python
+ocr = PaddleOCR() # need to run only once to download and load model into memory
+img_path = 'PaddleOCR/doc/imgs_en/img_12.jpg'
+result = ocr.ocr(img_path,rec=False)
+```
+Sẽ chỉ nhận diện, kết quả trả về như sau:  
+
+> [[756.0, 812.0], [805.0, 812.0], [805.0, 830.0], [756.0, 830.0]]
+
+Chỉ có vị trí của các ký tự.  
+
+Nếu sử dụng:  
+
+```python
+ocr = PaddleOCR(lang='en') # need to run only once to load model into memory
+img_path = 'PaddleOCR/doc/imgs_words_en/word_10.png'
+result = ocr.ocr(img_path, det=False, cls=False)
+```
+Sẽ chỉ nhận dạng ký tự, kết quả trả về như sau:  
+
+> ['PAIN', 0.990372]
+
+Chỉ có ký tự đọc được và xác xuất của nó.  
+Nếu sử dụng:  
+```python
+ocr = PaddleOCR(use_angle_cls=True) # need to run only once to load model into memory
+img_path = 'PaddleOCR/doc/imgs_words_en/word_10.png'
+result = ocr.ocr(img_path, det=False, rec=False, cls=True)
+```
+Sẽ chỉ là phân loại, kết quả của nó sẽ là như sau:  
+
+> ['0', 0.99999964]
+
+Chỉ có kết quả phân loại và xác xuất dự đoán của nó.  
+
+Chỉ cần chạy lệnh trên thì các mô hình sẽ được tải vào thư mục tương ứng, các lần sau sẽ không phải tải lại từ đầu nữa, có thể thay đổi ngôn ngữ thành ngôn ngữ khác ở câu lệnh `lang = 'ch'`. Có các ngôn ngữ có sẵn là:  
+
+| Ngôn ngữ | Viết tắt |
+| :--- | :--- |
+|Vietnamese| vi|
+| Chinese & English | ch|
+| English | en |
+| Japan | japan |
+| Korean | korean |
+| Chinese Traditional | chinese_cht |
+| Russia | ru |
+| Hindi | hi |
+| Portuguese | pt |
+| Mongolian | mn |
+| ... | ... |
+
+Có thể tham khảo thêm [tại đây](https://paddlepaddle.github.io/PaddleOCR/latest/en/ppocr/blog/multi_languages.html#5-support-languages-and-abbreviations)
 
 # III. Video hướng dẫn  
 

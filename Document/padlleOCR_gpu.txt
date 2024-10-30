@@ -1,4 +1,4 @@
-Để chạy được paddleOCR trên GPU CÙNG VỚI ULTRALYTICS (nếu không chạy cùng ultralytics thì lên trang chủ paddleOCR cài phien bản GPU như bình thường: https://paddlepaddle.github.io/PaddleOCR/en/ppocr/quick_start.html#11-install-paddlepaddle)
+Để chạy được paddleOCR trên GPU CÙNG VỚI ULTRALYTICS (nếu không chạy cùng ultralytics thì lên trang chủ paddleOCR cài phien bản GPU như bình thường: https://paddlepaddle.github.io/PaddleOCR/latest/en/quick_start.html)
 Bước 1: Cài bản paddlepadlle-gpu phiên bản 2.4.2 với CUDA 11.7 (phiên bản này chỉ phù hợp với python 3.10):
 python -m pip install paddlepaddle-gpu==2.4.2.post117 -f https://www.paddlepaddle.org.cn/whl/windows/mkl/avx/stable.html
 
