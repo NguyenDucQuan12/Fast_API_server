@@ -1,0 +1,96 @@
+30/10/2024 01:53:59 PM DEBUG:	 proactor_events.py: __init__()-Line: 630	 message: Using proactor: IocpProactor
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_begin with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[61:80]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[82:141]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[143:155]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[157:167]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_headers_finished with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[171:32254]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:8192]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:8192]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:10492]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_end with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_begin with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[10555:10574]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[10576:10636]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[10638:10650]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[10652:10662]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_headers_finished with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[10666:16384]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:73728]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:31186]
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_end with no data
+30/10/2024 01:54:38 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_end with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_begin with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[60:79]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[81:140]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[142:154]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[156:166]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_headers_finished with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[170:15871]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:51948]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_end with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_begin with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[52010:52029]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[52031:52091]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[52093:52105]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[52107:52117]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_headers_finished with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[52121:114688]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:48065]
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_end with no data
+30/10/2024 01:55:30 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_end with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_begin with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[61:80]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[82:141]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[143:155]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[157:167]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_headers_finished with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[171:7678]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:52039]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_end with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_begin with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[52102:52121]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[52123:52183]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[52185:52197]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[52199:52209]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_headers_finished with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[52213:73728]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:89117]
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_end with no data
+30/10/2024 01:55:53 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_end with no data
+30/10/2024 01:57:35 PM DEBUG:	 proactor_events.py: __init__()-Line: 630	 message: Using proactor: IocpProactor
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_begin with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[59:78]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[80:139]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[141:153]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[155:165]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_headers_finished with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[169:59715]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_end with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_begin with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[59776:59795]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[59797:59857]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_field with data[59859:59871]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_header_value with data[59873:59883]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_header_end with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_headers_finished with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[59887:73216]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 624	 message: Calling on_part_data with data[0:97303]
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_part_end with no data
+30/10/2024 01:57:41 PM DEBUG:	 multipart.py: callback()-Line: 627	 message: Calling on_end with no data

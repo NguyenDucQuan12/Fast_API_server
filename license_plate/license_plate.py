@@ -106,7 +106,8 @@ def get_license_plate(license_plate_crop):
 
 
     # Đọc tất cả các ký tự chứa trong hình ảnh
-    result_license_plate= ocrEngine.ocr(license_plate_crop)[0]
+    # sử dụng cls khi văn bản có góc xoay 180 độ, nếu không có văn bản nào 180 độ thì nên đặt False để tăng hiệu suất
+    result_license_plate= ocrEngine.ocr(license_plate_crop, cls=False)[0]
 
     # Chuyển đổi ảnh từ dạng mảng sang dạng rgb
     # license_plate_crop_cvt = Image.fromarray(license_plate_crop)

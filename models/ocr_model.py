@@ -5,6 +5,13 @@ import paddle
 # gpu_available  = paddle.device.is_compiled_with_cuda()
 # print("GPU available:", gpu_available)
 
+
+
+# rec_model_dir: đường dẫn recognition model là mô hình nhận dạng ký tự (Đọc các ký tự)  
+# det_model_dir: đường dẫn detection model là mô hình nhận diện ký tự (Phát hiện vùng nào có các ký tự)  
+# cls_model_dir: đường dẫn classification model là phân loại ký tự (Phân loại nó theo các nhóm)
+
+
 # # sử dụng PaddleOCR ngôn ngữ tiếng Anh
 # ocrEngine = PaddleOCR(
 #             use_angle_cls=False,
@@ -13,8 +20,7 @@ import paddle
 #             use_gpu=True,
 #             rec_model_dir="assets/model/paddleocr/english/rec", # use in here
 #             det_model_dir="assets/model/paddleocr/english/det", # use in here
-#             cls_model_dir="assets/model/paddleocr/english/cls" # use in here
-#         )
+        # )
 
 # sử dụng PaddleOCR ngôn ngữ tiếng Trung
 ocrEngine = PaddleOCR(

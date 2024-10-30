@@ -989,7 +989,7 @@ Sau khi đã hoàn thành thì vào [trang chủ paddlepaddle-gpu](https://www.p
 Tuy nhiên phiên bản mình cần tìm là `paddlepađle-gpu 2.4.2` nên sẽ sử dụng câu lệnh sau:  
 
 ```python
-# Chỉ cso thể dùng với python 3.10
+# Chỉ có thể dùng với python 3.10
 python -m pip install paddlepaddle-gpu==2.4.2.post117 -f https://www.paddlepaddle.org.cn/whl/windows/mkl/avx/stable.html
 
 ```
@@ -1016,7 +1016,7 @@ Ta sử dụng paddleocr với gpu bằng câu lệnh sau.
 ```python
 from paddleocr import PaddleOCR
 # sử dụng PaddleOCR ngôn ngữ tiếng Trung
-ocrEngine = PaddleOCR(
+ocr = PaddleOCR(
             use_angle_cls=False,
             lang='ch',
             show_log=False,
@@ -1028,16 +1028,20 @@ ocrEngine = PaddleOCR(
 ```
 Trong đó:  
 
-> rec_model: recognition model là mô hình nhận dạng ký tự (Đọc các ký tự)  
-> det_mode: detection model là mô hình nhận diện ký tự (Phát hiện vùng nào có các ký tự)  
-> cls_model: classification model là phân loại ký tự (Phân loại nó theo các nhóm)
+> use_angle_cls=False là không sửu dụng chức năng phân loại  
+> lang='ch' là ngôn ngữ tiếng Trung  
+> show_log=False là không hiển thị log  
+> use_gpu=True là có sử dụng GPU
+> rec_model_dir: đường dẫn recognition model là mô hình nhận dạng ký tự (Đọc các ký tự)  
+> det_model_dir: đường dẫn detection model là mô hình nhận diện ký tự (Phát hiện vùng nào có các ký tự)  
+> cls_model_dir: đường dẫn classification model là phân loại ký tự (Phân loại nó theo các nhóm)
 
 ```python
 # Khởi tạo mô hình ocr kèm theo cấu hình
 ocr = PaddleOCR(use_angle_cls=True, lang='en')
 # đường dẫn hình ảnh
 img_path = 'PaddleOCR/doc/imgs_words_en/word_10.png'
-# Tiếm hành đọc ký tự
+# Tiến hành đọc ký tự
 result = ocr.ocr(img_path, cls = True)
 #hiển thị kết quả
 for idx in range(len(result)):
@@ -1057,7 +1061,7 @@ ocr = PaddleOCR(lang='en')
 img_path = 'PaddleOCR/doc/imgs_words_en/word_10.png'
 result = ocr.ocr(img_path, cls=False)
 ```
-Sẽ chỉ nhận diện và nhận dạng, kêt quả thu được như sau:  
+Sẽ chỉ nhận diện và nhận dạng, kết quả thu được như sau:  
 
 > [[[442.0, 173.0], [1169.0, 173.0], [1169.0, 225.0], [442.0, 225.0]], ['ACKNOWLEDGEMENTS', 0.99283075]]
 
@@ -1129,6 +1133,42 @@ Chỉ cần chạy lệnh trên thì các mô hình sẽ được tải vào th�
 
 Có thể tham khảo thêm [tại đây](https://paddlepaddle.github.io/PaddleOCR/latest/en/ppocr/blog/multi_languages.html#5-support-languages-and-abbreviations)
 
+##
+Ta có thể tải mô hình từ trang chủ mà sử dụng nó như sau.  
+Vào trang chủ `paddleocr` và vào mục model để xem danh sách các model đang được công khai bởi `paddleocr` [tại đây](https://paddlepaddle.github.io/PaddleOCR/latest/en/ppocr/model_list.html)  
+
+![alt text](image_github/list_model_paddleocr.png)
+
+Có 3 loại modle đã nêu ở trên chúng ta cần tải về như sau: `detection model`, `Recognition Model` và `Angle Classification Model`. Nếu văn bản của các bạn không xoay 180 độ thì không cần `Angle Classification Model`, việc bỏ nó sẽ giúp tăng hiệu suất.  
+
+![alt text](image_github/detection_paddleocr.png)
+
+Chúng ta sẽ tải `Inference mode` về. Đối với biển số của mình không có hình ảnh biển số nào quay ngược 180 độ nên mình sẽ không tải `Angle Classification Model` mà chỉ tải về `detection model`, `Recognition Model` như hình ảnh bên dưới.  
+
+![alt text](image_github/downloaf_paddleocr_model.png)
+
+Sau đó mình giải nén và đặt các tệp tin vào các thư mục tương ứng như `cls`, `det`, `rec`. Ví dụ với thư mục nhận diện ngôn ngữ tiếng Anh như sau:  
+
+![alt text](image_github/extract_en_paddleocr_model.png)
+
+Và để sử dụng model này thì mình khai báo như sau:  
+
+```python
+ # sử dụng PaddleOCR ngôn ngữ tiếng Anh
+ocrEngine = PaddleOCR(
+            use_angle_cls=False,
+            lang='en',
+            show_log=False,
+            use_gpu=True,
+            rec_model_dir="assets/model/paddleocr/english/rec", # use in here
+            det_model_dir="assets/model/paddleocr/english/det", # use in here
+        )
+
+# sử dụng cls khi văn bản có góc xoay 180 độ, nếu không có văn bản nào 180 độ thì nên đặt False để tăng hiệu suất
+result_license_plate= ocrEngine.ocr(license_plate_crop, cls=False)[0]
+```
+##
+
 # III. Video hướng dẫn  
 
 <p align="center">
@@ -1137,6 +1177,9 @@ Có thể tham khảo thêm [tại đây](https://paddlepaddle.github.io/PaddleO
     <a href="https://youtu.be/FnqKNUp4Htg?si=gEbdzVxHgHajw9V6"><img src="https://img.shields.io/badge/Môi_trường_ảo-Python-8A2BE2.svg?sanitize=true"></a>
     <a href="https://youtu.be/QBbAIIomoGM?si=HgGa5yrfTihq-KOR"><img src="https://img.shields.io/badge/Huấn_luyện_yolo-Visual_studio_code-blue?sanitize=true"></a>
     <a href="https://youtu.be/cI1MAaNQ560?si=Aup1YxdS5XhLjdCz"><img src="https://img.shields.io/badge/Sử_dụng_GPU-cho_các_model_AI-2ecc71?sanitize=true"></a>
+    <a href="https://youtu.be/PtgXJvPS0E8?si=aAFUCkdII-BIIJnZ"><img src="https://img.shields.io/badge/PaddleOCR-CPU_cho_người_bắt_đầu-f39c12?sanitize=true"></a>
+    <a href=""><img src="https://img.shields.io/badge/Video-tiếp_theo-a2d9ce?sanitize=true"></a>
+    <a href=""><img src="https://img.shields.io/badge/Video-tiếp_theo-bb8fce?sanitize=true"></a>
     <a href="./LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-dfd.svg"></a>
     <a href=""><img src="https://img.shields.io/github/v/release/NguyenDucQuan12/Fast_API_server?color=ffa"></a>
     <a href=""><img src="https://img.shields.io/badge/python-3.10+-aff.svg"></a>
