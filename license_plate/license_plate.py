@@ -142,6 +142,7 @@ def predict(image, image2, save=True):
     img_path = "None"    #default
     license_plate_crop = cv2.imread("assets\\image\\img_src\\not_found_license_plate.png")
 
+    # Kiểm tra xem hình ảnh gửi đến api là frame từ camera hay hình ảnh có định dạng png, jpg, ...
     image = check_image(image=image)
     image2 = check_image(image=image2)
 

@@ -27,7 +27,11 @@
     - [2. PaddleOCR](#2-paddleocr)
     - [3. Kết hợp AI vào FastAPI](#3-kết-hợp-ai-vào-fastapi)
 
-[III. Video hướng dẫn](#iii-video-hướng-dẫn)
+[III. Deploy FastAPI với Docker](#iii-deploy-fastapi-với-docker)
+    - [1. Tải Docker Desktop](#1-tải-docker-desktop)
+    - [2. Cài đặt file để chạy](#2-cài-đặt-file-để-chạy)
+
+[IV . Video hướng dẫn](#iv-video-hướng-dẫn)
 
 # I. FastAPI
 
@@ -1323,8 +1327,170 @@ face_frame_path = os.path.join(temp_dir, face_frame)
 ```
 Ta sử dụng hình ảnh tạm thời này để đưa vào hàm nhận diện biển số `predict` nhưu hai hình ảnh, và sau khi sử dụng xong thì ta phải xóa các thư mục hay tệp tin tạm thời này để tránh việc rò rỉ bộ nhớ không đáng có. Vậy alf ta đã tạo api cho người dùng với địa chỉ:  
 `http://192.168.0.100:8000/license_plate/detect`  
-Xem ví dụ cụ thể [tại đây](router/license_plate_router.py)
-# III. Video hướng dẫn  
+Xem ví dụ cụ thể [tại đây](router/license_plate_router.py)  
+
+# III. Deploy FastAPI với Docker
+
+## 1. Tải Docker desktop
+
+Để dễ dàng quan sát thì ta sử dụng docker desktop, các bạn có thể tải về tại [trang chủ](https://www.docker.com/products/docker-desktop/)  
+Sau khi cài đặt thì đăng nhập bằng tài khoản google hawocj github như mình.  
+
+![alt text](image_github/docker_desktop.png)
+
+## 2. Cài đặt file để chạy
+Đầu tiên ta mở dự án và khởi động môi trường ảo (nếu có)  
+
+Tiêp đó ta sẽ tạo một file có tên `Dockerfile` để cấu hình.  
+
+![alt text](image_github/docker_file.png)
+
+```Docker
+FROM python:3.10
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 80
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+```
+Trong đó `python:3.10` là phiên bản `python` mà chúng ta đang sử dụng cho dự án. `COPY requirements.txt .` là sao chép các thư viện đã cài đặt vào tệp tin, và tiến hành cài đặt các thư viện cần thiết. Còn `COPY . .` sẽ sao chép toàn bộ mã nguồn vào container. ...
+
+Sau khi cấu hình xong tệp `dockerfile` thì các bạn cần phải xuất các thư viện sử dụng trong dự án bằng câu lệnh:  
+
+```python
+python -m pip freeze > requirements.txt
+```
+
+Sau đó xây dựng `image` trong `Docker` bằng câu lệnh sau:  
+
+```python
+docker build -t smartparking_server .
+```
+Trong đó:  
+
+> -t smartparking_server: Đặt tên cho hình ảnh là smartparking_server.  
+> .: Chỉ định ngữ cảnh xây dựng là thư mục hiện tại.  
+
+Quá trình này sẽ đọc `Dockerfile`, và tạo một `image Docker` theo hướng dẫn trong `Dockerfile` rồi cài đặt các thư viện và mã nguồn của dự án.  
+
+![alt text](image_github/build_container_docker.png)
+
+Trong quá trình xây dựng `image` có thể xảy ra một số lỗi sau:  
+
+Nêu gặp lỗi:  
+```
+218.9 ERROR: Could not find a version that satisfies the requirement fonttools==4.54.1 (from versions: none)
+218.9 ERROR: No matching distribution found for fonttools==4.54.1
+```
+thì hãy vào `requirements.txt` xóa dòng đó đi, nó sẽ được tự động cài đặt thông qua gói khác.  
+
+Nếu gặp lỗi:  
+
+```
+38.85 ERROR: No matching distribution found for paddlepaddle-gpu==2.4.2.post117
+```
+
+Sau khi xây dựng xong thì có thể chạy `container` bằng câu lệnh sau:  
+
+```python
+docker run -d --name mycontainer -p 80:80 smartparking_server
+```
+
+Trong đó:  
+
+> -d: Chạy container ở chế độ nền (detached mode).  
+> --name mycontainer: Đặt tên cho container là mycontainer.  
+> -p 80:80: Map cổng 80 của máy chủ với cổng 80 của container.  
+> smartparking_server: Tên hình ảnh Docker mà bạn đã tạo.  
+
+Sau đó mở ứng dụng `Docker Desktop` sẽ thấy container đang chạy.  
+
+Nếu có sự thay đổi về mã nguồn thì ta cần xây dựng lại `image Docker` như sau:  
+
+```python
+docker build -t smartparking_server .
+
+```
+Và khởi động lại với quy trình như sau: dừng container cũ, xóa container cũ và chạy container mới  
+
+```
+docker stop smartparking_server-container
+docker rm smartparking_server-container
+docker run -d --name smartparking_server-container -p 8000:80 smartparking_server
+```
+
+## 3. Một số lệnh
+
+Liệt kê tất cả các container (bao gồm cả container đang chạy và đã dừng):  
+```
+docker ps -a
+```
+Kết quả thu được bao gồm các container đang dùng image:  
+
+![alt text](image_github/list_container.png)
+
+Dừng container:  
+
+```
+docker stop CONTAINER ID
+```
+
+Xóa một container:  
+
+```
+docker rm 2c7de8cdecc4
+```
+
+![alt text](image_github/remove_container.png)
+
+Sau đó xóa `image` docker:  
+
+```
+docker rmi smartparking_server
+```
+kết quả sẽ là:  
+```
+(Smart Parking Server) PS D:\Project\SmartParkingServer> docker rmi smartparking_server
+Untagged: smartparking_server:latest
+Deleted: sha256:fb8c4f407f48bb36e63e8e4ff39ade249b51190ad1ce7e48c137a5ee0cfbb896
+```
+
+## 
+Xóa các container đã dừng:  
+```
+docker container prune
+```
+
+Xóa các image không còn sử dụng:  
+```
+docker image prune -a
+```
+Xóa các network không còn sử dụng:  
+```
+docker network prune
+```
+
+### Lệnh này sẽ xóa tất cả các đối tượng không được sử dụng, bao gồm containerm images, network và volumes
+
+```
+docker system prune -a --volumes
+```
+##
+
+ĐỂ tránh Doker chiếm quá nhiều dữ liệu thì chuyển thưu mục từ ổ C sang thư mục khá. Thư mục cảu Docker tại ổ C như sau: `C:\Users\Server_Quan_IT\AppData\Local\Docker`  
+Ta sẽ chuyển nó sang ổ đĩa khác, bằng lệnh `MOVE` KHÔNG PHẢI `COPY`. Và sau đó chạy lệnh tạo liên kết tượng trưng bằng CMD để nó chạy thì tự động vào thư mục ổ đĩa mới. Như ví dụ mình chuyển sang ổ I  
+Mở CMD với quyền `administrator` và chạy lệnh sau:  
+```
+mklink /J "%LocalAppData%\Docker" "I:\Docker"
+```
+# IV. Video hướng dẫn  
 
 <p align="center">
 <p align="center">
