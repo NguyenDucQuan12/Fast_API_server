@@ -13,6 +13,7 @@ from sqlalchemy.engine import URL
 MY_HOSTNAME = socket.gethostname()
 MY_IP_ADDR = socket.gethostbyname(MY_HOSTNAME)
 
+# "host.docker.internal" khi chạy bằng docker thì thay ip bằng câu này
 # Cấu trúc chuỗi kết nối đến SQL Server
 # pip install pyodbc
 connection_url = URL.create(

@@ -1,20 +1,25 @@
-from ultralytics import YOLO
-import torch
-import logging
+from PIL import Image
+import cv2
+import pillow_heif
+import numpy as np
 
-# Đầu tiên lên chạy câu lệnh `nvidia-smi` để xem phiên bản Cuda cần thiết là bao nhiêu, xong lên trang chủ nvidia tải về
-# Tiếp theo tải CUDA tương ứng từ trang chủ, giải nén và cài đặt
-# Thêm CUDA vào path nếu chưa có: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.4\bin, lib và incude
+# pillow_heif.register_heif_opener()
 
-logger = logging.getLogger(__name__)
+image_path = 'assets\\image\\image_test\\20240425_061413796_iOS.heic'
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-# logger.info(f"Sử dụng {device}")
-print(device)
-
-license_plate_detect_gpu = YOLO('assets/model/best.pt').to(device)
-
-# Model yolo obb (có bounding box có thể xoay theo đối tượng)
-# license_plate_detect_cpu = YOLO('assest/model/best-yolo-obb.pt')
-
-
+try:
+    heif_file = pillow_heif.read_heif(image_path)
+    image = Image.frombytes(
+        heif_file.mode,
+        heif_file.size,
+        heif_file.data,
+        "raw",
+        heif_file.mode
+    )
+    # Chuyển đổi ảnh PIL thành NumPy array và chuyển sang định dạng BGR cho OpenCV
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    print(image)
+    # image = Image.open(image_path)
+    # image.show()
+except Exception as e:
+    print(f"Lỗi khi mở ảnh HEIC: {e}")
