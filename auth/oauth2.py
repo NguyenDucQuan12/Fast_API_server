@@ -7,14 +7,15 @@ from jose import jwt # pip install python-jose
 from jose.exceptions import JWTError
 from db.database import get_db
 from db import db_user
+from file import password
  
 
 # Khóa bí mật, nên tạo nó ngẫu nhiên bằng cách sau
 # mở terminal và chạy lệnh: openssl rand -hex 32
 # Khóa này chỉ dành cho việc phát triển API, không ai khác có thể sử dụng
 # Chỉ những bên có SECRET_KEY mới có thể xác thực và giải mã token.
-SECRET_KEY = '77407c7339a6c00544e51af1101c4abb4aea2a31157ca5f7dfd87da02a628107'
-ALGORITHM = 'HS256'
+SECRET_KEY = password.SECRET_KEY
+ALGORITHM = password.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 
 # chỉ định endpoint để lấy token

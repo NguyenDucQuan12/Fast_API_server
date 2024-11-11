@@ -3,6 +3,7 @@ import socket
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.engine import URL
+from file import password
 
 """
 Định nghĩa cơ sở dữ liệu 
@@ -18,11 +19,11 @@ MY_IP_ADDR = socket.gethostbyname(MY_HOSTNAME)
 # pip install pyodbc
 connection_url = URL.create(
     "mssql+pyodbc",
-    username="sa", # Tên đăng nhập 
-    password="123456789", # mật khẩu đăng nhập
+    username=password.DB_USER, # Tên đăng nhập 
+    password=password.DB_PASSWORD, # mật khẩu đăng nhập
     host=MY_IP_ADDR, #Địa chỉ IP của máy tính lấy được
     port=1433, # cổng kết nối khi mở kết nối SQL server, xem them wor video youtube của bản thân
-    database="Smart_Parking_Server", # Tên của database cần truy cập
+    database= password.DB_NAME, # Tên của database cần truy cập
     query={
         "driver": "ODBC Driver 18 for SQL Server", # Phiên bản driver của ODBC đã tải về từ microsoft
         "TrustServerCertificate": "yes"  
