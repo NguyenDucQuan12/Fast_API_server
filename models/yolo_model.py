@@ -13,7 +13,12 @@ logger = logging.getLogger(__name__)
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 logger.info(f"Sử dụng {device} cho mô hình YOLO")
 
-license_plate_detect_gpu = YOLO('assets/model/yolo/yolov8_pretrain/last.pt').to(device) # yolov8
+def license_plate_detect_gpu(image):
+    model = YOLO('assets/model/yolo/yolov8_pretrain/best.pt').to(device) # yolov8
+
+    result = model(image, max_det = 1)[0]
+
+    return result
 # license_plate_detect_gpu = YOLO("assets\\model\\yolo\\yolov11_pretrain\\last.pt").to(device= device) # yolov11
 
 # Dự đoán thử

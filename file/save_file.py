@@ -52,7 +52,7 @@ def save_avatar_upload_from_user(user_id_code, avatar):
         )
     return avatar_path
 
-# Lưu ảnh biển số, toàn cảnh, ĐÃ TEST XONG (tkCamera, tkButton)
+# Lưu ảnh biển số, toàn cảnh
 def save_image_license_plate(license_plate_VN, license_plate_crop, image_license_plate, image_face):
 
     # Lấy thời gian ngày tháng năm giờ phút giấy theo định dạng string

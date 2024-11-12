@@ -32,3 +32,9 @@ ocrEngine = PaddleOCR(
             det_model_dir="assets/model/paddleocr/china/det", # use in here
             cls_model_dir="assets/model/paddleocr/china/cls" # use in here
         )
+
+def detect_OCR (image):
+    
+    result = ocrEngine.ocr(image, cls=False)[0]
+
+    return result

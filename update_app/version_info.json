@@ -1,6 +1,6 @@
 {
-    "latest_version": "1.0.0",
-    "download_url": "http://192.168.0.100:8000/update/download/1.0.0",
-    "release_notes": "Thay đổi hình ảnh phần mềm và thay đổi nơi lưu log là ở: C:\\Users\\Server_Quan_IT\\AppData\\Roaming\\SmartParking .",
-    "checksum": "96c5f635de978cfe1b636db56c761880b3796edbeecafc4de41cfb02ef3f3e35"
+    "latest_version": "0.0.0",
+    "download_url": "http://192.168.0.100:8000/update/download/0.0.0",
+    "release_notes": "Thay đổi vị trí lưu hình ảnh từ server vào thư mục Appdata\\local. Thay đổi vị trí lưu log của Updater vào Appdata\\Roaming",
+    "checksum": "95289bbff3482100395a00eb0817bfc3eadae99bf23bbc17e6005b36ff4c1287"
 }

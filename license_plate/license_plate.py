@@ -1,8 +1,13 @@
 import string
 import logging
 import cv2
+import shutil
+import asyncio
+import os
+import tempfile
+from fastapi import UploadFile, HTTPException
 from models.yolo_model import license_plate_detect_gpu
-from models.ocr_model import ocrEngine
+from models.ocr_model import detect_OCR
 from fastapi import HTTPException
 from file.save_file import save_image_license_plate
 from file.check_image import check_image
@@ -18,7 +23,7 @@ def license_complies_format(license_plate):
     license_plate_size= len(license_plate)
     # example: 38-F7 3901
     # Nếu AI đọc được các ký tự có độ dài khác 9 và 11 thì đó không phải là biển số
-    if (license_plate_size != 9) and (license_plate_size != 11):
+    if license_plate_size not in [9, 11]:
         return False, license_plate
     
     # So sánh xem các ký tự đọc được có khớp với biển số xe không
@@ -100,19 +105,19 @@ def license_plate_format(license_plate, license_plate_size):
     return license_plate_
 
 # Tiến hành đọc các ký tự từ biển số đã được cắt từ hình ảnh gốc
-def get_license_plate(license_plate_crop):
+async def get_license_plate(license_plate_crop):
+    """
+    Đọc các kí tự trong hình ảnh  
+    - **license_plate_crop**: Là hình ảnh chứa các ký tự cần đọc
+    """
 
     is_license_plate = False
 
-
-    # Đọc tất cả các ký tự chứa trong hình ảnh
+    # Đọc tất cả các ký tự chứa trong hình ảnh vào một luồng phụ và có chế độ bất đồng bộ
     # sử dụng cls khi văn bản có góc xoay 180 độ, nếu không có văn bản nào 180 độ thì nên đặt False để tăng hiệu suất
-    result_license_plate= ocrEngine.ocr(license_plate_crop, cls=False)[0]
-
-    # Chuyển đổi ảnh từ dạng mảng sang dạng rgb
-    # license_plate_crop_cvt = Image.fromarray(license_plate_crop)
+    result_license_plate = await asyncio.to_thread(detect_OCR, license_plate_crop)
     
-    # Nếu đọc được 
+    # Kiểm tra kết quả 
     if result_license_plate:
         # print(f"Các ký tự đọc được từ hình ảnh: {result_license_plate}")
         # Ghép từng ký tự ở hai hàng của biển số lại với nhau: 38-F7
@@ -133,9 +138,8 @@ def get_license_plate(license_plate_crop):
 
     return  is_license_plate, license_plate # ,license_plate_crop_cvt
 
-
 # Dự đoán và Cắt ảnh với hình ảnh bình thường
-def predict(image, image2, save=True):
+async def predict(image, image2, save=True):
     
     is_license_plate= False   #default
     license_plate = "Không thấy biển số"   #default
@@ -143,8 +147,8 @@ def predict(image, image2, save=True):
     license_plate_crop = cv2.imread("assets\\image\\img_src\\not_found_license_plate.png")
 
     # Kiểm tra xem hình ảnh gửi đến api là frame từ camera hay hình ảnh có định dạng png, jpg, ...
-    image = check_image(image=image)
-    image2 = check_image(image=image2)
+    image = await asyncio.to_thread(check_image, image=image)
+    image2 = await asyncio.to_thread(check_image, image=image2)
 
     # Kiểm tra nếu không thể đọc được ảnh
     if image is None:
@@ -158,7 +162,7 @@ def predict(image, image2, save=True):
                     "face_path": img_path
                     })
     # phát hiện khu vực có biển số, max_det là số lượng đối tượng phát hiện trên mỗi hình ảnh(max 300)
-    results= license_plate_detect_gpu(image, max_det = 1)[0]
+    results = await asyncio.to_thread(license_plate_detect_gpu, image)
 
     if results:
         # Trích xuất vị trí bounding box, là vị trí tọa độ chứa biển số
@@ -171,15 +175,18 @@ def predict(image, image2, save=True):
             # Cắt khu vực chứa biển số để đưa vào paddleocr
             license_plate_crop = image[int(y1):int(y2), int(x1):int(x2)]
 
-            # Đọc các ký tự từ biển số
-            is_license_plate, license_plate = get_license_plate(license_plate_crop)
+            # Đọc các ký tự từ biển số với hàm async
+            is_license_plate, license_plate = await get_license_plate(license_plate_crop)
 
             #lưu hình ảnh biển số vào thư mục
             if save:
-                license_plate_path, face_path = save_image_license_plate(license_plate_VN=license_plate,
-                                                                        license_plate_crop= license_plate_crop,
-                                                                        image_license_plate= image,
-                                                                        image_face= image2)
+                license_plate_path, face_path = await asyncio.to_thread(
+                    save_image_license_plate,
+                    license_plate_VN=license_plate,
+                    license_plate_crop=license_plate_crop,
+                    image_license_plate=image,
+                    image_face=image2
+                )
             
             # Sau khi xử lý xong hình ảnh, giải phóng bộ nhớ của hình ảnh
             del license_plate_crop
@@ -196,10 +203,13 @@ def predict(image, image2, save=True):
     
     # lưu hình ảnh biển số vào thư mục
     if save:
-        license_plate_path, face_path = save_image_license_plate(license_plate_VN="not_detect_license_plate",
-                                                                license_plate_crop= license_plate_crop,
-                                                                image_license_plate= image,
-                                                                image_face= image2)
+            license_plate_path, face_path = await asyncio.to_thread(
+                save_image_license_plate,
+                license_plate_VN=license_plate,
+                license_plate_crop=license_plate_crop,
+                image_license_plate=image,
+                image_face=image2
+            )
 
     # Giải phóng bộ nhớ của hình ảnh đầu vào
     # Nếu không phát hiện biển số
@@ -214,3 +224,18 @@ def predict(image, image2, save=True):
                 "license_plate_path": img_path,
                 "face_path": img_path
         }
+
+
+async def save_temp_image(upload_file: UploadFile, file_name: str):
+    """
+    Tạo file tạm để lưu hình ảnh khi người dùng gửi lên server  
+    Sử dụng `await` để dùng bất đồng bộ  
+    - **upload_file**: Là tệp tin được gửi kèm API  
+    - **file_name**: Là tên tệp cho file tạm  
+    """
+    temp_dir = tempfile.gettempdir()
+    file_path = os.path.join(temp_dir, file_name)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(upload_file.file, buffer)
+    upload_file.file.close()
+    return file_path
