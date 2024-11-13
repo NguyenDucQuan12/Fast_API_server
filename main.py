@@ -1,51 +1,86 @@
 # import tensorflow as tf
-from fastapi import FastAPI # pip install "fastapi[standard]"
+from fastapi import FastAPI, Request # pip install "fastapi[standard]"
 import uvicorn
 import os
-from fastapi.responses import FileResponse
+import json
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi_cache.backends.inmemory import InMemoryBackend
 from fastapi_cache import FastAPICache
-from fastapi_cache.decorator import cache
-import logging
 from fastapi.middleware.cors import CORSMiddleware
 from db.database import engine
 from db import model
 from router import employee_router, user_router, license_plate_router, vehicles_router, image_router, mode_lane_router, update_app_router, get_file_router
 from auth import authentication
 from update_app import update_app
-
-# Tạo logging 
-"""
-Tạo logging để lưu lại những thông tin ra với các tham số cụ thể như: thời gian, chế độ, tên file, hàm gọi, dòng code, id và tên thread, và tin nhắn
-Lưu ý có thêm tham số: force = True bởi vì xung đột giữa các trình ghi nhật ký cảu các thư viện hoặc file
-Nếu đối số từ khóa này được chỉ định là đúng, mọi trình xử lý hiện có được gắn vào bộ ghi nhật ký gốc sẽ bị 
-xóa và đóng trước khi thực hiện cấu hình như được chỉ định bởi các đối số khác
-Đối với file main sẽ dùng: logger = logging.getLogger()
-Còn các file khác sẽ dùng: logger = logging.getLogger(__name__) thì sẽ tự động cùng lưu vào 1 file, cùng 1 định dạng
-"""
-log_file_path = "log.txt"
-
-logger = logging.getLogger()
-# Dòng dưới sẽ ngăn chặn việc có những log không mong muốn từ thư viện PILLOW
-# ví dụ: 2020-12-16 15:21:30,829 - DEBUG - PngImagePlugin - STREAM b'PLTE' 41 768
-logging.getLogger("PIL.PngImagePlugin").propagate = False
-logging.basicConfig(filename=log_file_path, filemode= 'a',
-                    format='%(asctime)s %(levelname)s:\t %(filename)s: %(funcName)s()-Line: %(lineno)d\t message: %(message)s',
-                    datefmt='%d/%m/%Y %I:%M:%S %p', encoding = 'utf-8', force=True)
-logger.setLevel(logging.DEBUG)
+from logs.logging_config import logger
 
 app = FastAPI(
     docs_url="/myapi",  # Đặt đường dẫn Swagger UI thành "/myapi"
     redoc_url=None  # Tắt Redoc UI
 )
 
+# Các đường dẫn cần bỏ qua khi log
+# Vì các api này kết quả trả về không phải json mà là html, dẫn đến lỗi 
+EXCLUDED_PATHS = ["/myapi", "/redoc", "/openapi.json"]
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """
+    Cấu hình log mỗi khi có người gọi api  
+    Khi có bất kỳ api nào được gọi thì hàm này cũng chạy để ghi lại log với cấu trúc:  
+    - `time - IP - API Name - Params - Result`  
+    - **2024-11-13 10:24:54,615 - 192.168.0.100 - / - {} - {"Message":"World"}**
+    """
+    # Lấy địa chỉ IP của người gọi API
+    client_ip = request.client.host
+
+    # Lấy tên endpoint và các tham số truyền vào
+    api_name = request.url.path
+    params = dict(request.query_params)  # Lấy query parameters nếu có
+
+    # Bỏ qua log nếu đường dẫn nằm trong danh sách EXCLUDED_PATHS
+    if api_name in EXCLUDED_PATHS:
+        # Ghi log
+        logger.info(
+            "",
+            extra={
+                "ip": client_ip,
+                "api_name": api_name,
+                "params": "nothing",
+                "result": "nothing",
+            }
+        )
+        return await call_next(request)
+
+    # Gọi API và lấy kết quả
+    response = await call_next(request)
+
+    # Lấy nội dung trả về
+    response_body = [section async for section in response.__dict__['body_iterator']]
+    result = response_body[0].decode() if response_body else "No content"
+
+    # Ghi log
+    logger.info(
+        "",
+        extra={
+            "ip": client_ip,
+            "api_name": api_name,
+            "params": json.dumps(params),
+            "result": result,
+        }
+    )
+
+    # Đặt lại nội dung response để trả về
+    response = JSONResponse(content=json.loads(result) if result else {})
+    
+    return response
+
 # Khởi tạo in-memory cache trong event startup
 @app.on_event("startup")
 async def on_startup() -> None:
     in_memory_cache = InMemoryBackend()
     FastAPICache.init(in_memory_cache)
-
-
+    print("Thông báo: FastAPI đã khởi chạy thành công!")
 
 app.include_router(employee_router.router)
 app.include_router(user_router.router)
@@ -57,8 +92,6 @@ app.include_router(mode_lane_router.router)
 app.include_router(update_app_router.router)
 app.include_router(get_file_router.router)
 app.include_router(update_app.router)
-
-
 
 
 @app.get("/")
@@ -97,7 +130,7 @@ app.add_middleware(
 if __name__ == "__main__":
     # Chạy file này bằng cách `python service\main.py`
     # sẽ lấy máy chạy file này làm máy chủ, các máy tính cùng dải mạng đều có thể truy cập API này
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("__main__:app", host="0.0.0.0", port=8000)
 
     # Hoặc gõ trực tiếp lệnh `fastapi dev main.py` để vào chế độ developer
     # Hoặc gõ trực tiếp lệnh `fastapi run main.py` để vào chế độ lấy máy chạy làm server

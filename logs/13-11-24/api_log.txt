@@ -1,0 +1,4 @@
+2024-11-13 11:18:22,921 - 192.168.0.100 - / - {} - {"Message":"World"}
+2024-11-13 11:18:33,860 - 192.168.0.100 - /license_plate/detect - {} - {"is_license_plate":true,"license_plate":"38-AC046.02","license_plate_path":"data/license_plate/13-11-24/38-AC046.02/background_2024-11-13-11-18-32.png","face_path":"data/license_plate/13-11-24/38-AC046.02/face2024-11-13-11-18-32.png"}
+2024-11-13 11:18:40,403 - 192.168.0.100 - /myapi - nothing - nothing
+2024-11-13 11:18:40,685 - 192.168.0.100 - /openapi.json - nothing - nothing
