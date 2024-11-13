@@ -16,7 +16,10 @@ logger.info(f"Sử dụng {device} cho mô hình YOLO")
 def license_plate_detect_gpu(image):
     model = YOLO('assets/model/yolo/yolov8_pretrain/best.pt').to(device) # yolov8
 
-    result = model(image, max_det = 1)[0]
+    # verbose=False sẽ ko hiển thị log khi dự đoán: 
+    # 0: 640x480 1 bien-so, 125.7ms
+    # Speed: 0.0ms preprocess, 125.7ms inference, 15.6ms postprocess per image at shape (1, 3, 640, 480)
+    result = model(image, verbose=False, max_det = 1)[0]
 
     return result
 # license_plate_detect_gpu = YOLO("assets\\model\\yolo\\yolov11_pretrain\\last.pt").to(device= device) # yolov11
