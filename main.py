@@ -128,9 +128,8 @@ app.add_middleware(
 )
 
 if __name__ == "__main__":
-    # Chạy file này bằng cách `python service\main.py`
-    # sẽ lấy máy chạy file này làm máy chủ, các máy tính cùng dải mạng đều có thể truy cập API này
-    uvicorn.run("__main__:app", host="0.0.0.0", port=8000)
+    #Thêm tham số log_config= "logs\\logging_config.json" để chuyển các log của uvicorn vào tệp
+    uvicorn.run("__main__:app", host="0.0.0.0", port=8000, log_level= "ERROR", log_config= "logs\\logging_config.json")  # log_config= "logs\\logging_config.json"
 
     # Hoặc gõ trực tiếp lệnh `fastapi dev main.py` để vào chế độ developer
     # Hoặc gõ trực tiếp lệnh `fastapi run main.py` để vào chế độ lấy máy chạy làm server
