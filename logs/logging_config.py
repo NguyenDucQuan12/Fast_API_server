@@ -31,3 +31,4 @@ file_handler.setFormatter(formatter)
 logger = logging.getLogger("api_logger")
 logger.setLevel(logging.INFO)
 logger.addHandler(file_handler)
+logger.propagate = False  # Tắt propagate để log không xuất hiện trên terminal: [2024-11-13 12:59:03,906] [    INFO] main.py:44 - 
