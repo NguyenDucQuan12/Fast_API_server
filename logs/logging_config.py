@@ -3,6 +3,15 @@ import datetime
 import os
 from logging.handlers import TimedRotatingFileHandler
 
+# Định nghĩa CustomFilter
+class CustomFilter(logging.Filter):
+    def filter(self, record):
+        record.ip = getattr(record, 'ip', '-')
+        record.api_name = getattr(record, 'api_name', '-')
+        record.params = getattr(record, 'params', '-')
+        record.result = getattr(record, 'result', '-')
+        return True
+
 # Hàm tạo đường dẫn log theo ngày
 def get_log_file_path():
     # Lấy ngày hiện tại theo định dạng DD-MM-YY
@@ -21,6 +30,9 @@ file_handler = TimedRotatingFileHandler(
 )
 file_handler.suffix = ""  # Đặt suffix là chuỗi rỗng, vì đường dẫn đã bao gồm ngày
 
+# Thêm CustomFilter vào handler
+file_handler.addFilter(CustomFilter())
+
 # Định dạng log theo yêu cầu
 formatter = logging.Formatter(
     "%(asctime)s - %(ip)s - %(api_name)s - %(params)s - %(result)s"
@@ -31,4 +43,4 @@ file_handler.setFormatter(formatter)
 logger = logging.getLogger("api_logger")
 logger.setLevel(logging.INFO)
 logger.addHandler(file_handler)
-logger.propagate = False  # Tắt propagate để log không xuất hiện trên terminal: [2024-11-13 12:59:03,906] [    INFO] main.py:44 - 
+logger.propagate = False  # Tắt propagate để log không xuất hiện trên terminal
