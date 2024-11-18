@@ -32,7 +32,10 @@ connection_url = URL.create(
 
 # Kết nối đến SQL Server
 engine = create_engine(
-    connection_url
+    connection_url,
+    pool_pre_ping=True,  # Kích hoạt giúp kiểm tra kết nối trước khi sử dụng. Nếu kết nối đã bị mất, SQLAlchemy sẽ tự động loại bỏ kết nối đó và tạo một kết nối mới.
+    pool_recycle=1800,   # Tái tạo các kết nối sau một khoảng thời gian nhất định. Tái tạo kết nối sau 1800 giây (30 phút)
+    pool_size=20,        # Kích thước pool kết nối
 )
 
 # Tạo một nhà máy (sessionmaker) tự động tạo các Session
@@ -46,6 +49,9 @@ Base = declarative_base()
 # Hàm lấy session cho mỗi request, khi gọi các lệnh đến Database thì cần gọi hàm này để mở kết nối đến Database
 # Hàm này sẽ tự động đóng kết nối sau khi sử dụng xong
 def get_db():
+    """
+    Mở một kết nối đến SQL Server để thực hiện các thao tác CRUD
+    """
     db = SessionLocal()
     try:
         yield db
