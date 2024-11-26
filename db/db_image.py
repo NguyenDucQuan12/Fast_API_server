@@ -1,5 +1,5 @@
 from sqlalchemy.orm.session import Session
-from fastapi import HTTPException, status, UploadFile, File
+from fastapi import HTTPException, status
 from sqlalchemy import exc, desc
 from db.model import DbImage_Employee
 from schemas.schemas import ImageBase
@@ -9,7 +9,7 @@ import datetime
 async def create_image(db: Session, request: ImageBase):
     """
     Tạo thông tin nhân viên mới vào cơ sở dữ liệu  
-    Các thông tin yêu cầu người dùng cung cấp phải đầy đủ như đã khai báo ở 
+    Các thông tin yêu cầu người dùng cung cấp phải đầy đủ như đã khai báo ở `ImageBase`  
     
     """
     # Tìm kiếm bản ghi hiện có với id_employee và in_out = 'in'
@@ -74,6 +74,10 @@ async def create_image(db: Session, request: ImageBase):
 
 def get_latest_in_employee_from_id_employee(id_employee: int, db: Session):
 
+    """
+    Tìm thông tin về dữ liệu vào mới nhất
+    """
+
     # Truy vấn để tìm record thỏa mãn id_employee, in_out = "in", và thời gian gần đây nhất
     employee_image = db.query(DbImage_Employee).filter(
         DbImage_Employee.id_employee == id_employee,
@@ -86,8 +90,8 @@ def get_latest_in_employee_from_id_employee(id_employee: int, db: Session):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={   
                         "error": f"Phương tiện chưa có thông tin lúc đi vào, vui lòng kiểm tra lại"
-                    })
-
+                    }
+        )
     # Trả về kết quả dưới dạng JSON
     return employee_image
 

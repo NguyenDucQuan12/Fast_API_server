@@ -59,22 +59,20 @@ def save_image_license_plate(license_plate_VN, license_plate_crop, image_license
     today = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")) 
     date_today = str(datetime.datetime.now().strftime("%d-%m-%y"))
 
-    # Tạo đường dẫn lưu hình ảnh: data/license_plate/14-09-24/38-F73901
-    save_dir_license_plate= "data/license_plate/"+ date_today + "/" + license_plate_VN 
-
     # Loại bỏ ký tự nếu nó nằm ngoài: chữ cái, số, dấu gạch ngang, gạch dưới, khoảng trắng
     # ví dụ: "29-K1!@# 284$%^62.png" sau khi loại bỏ các ký tự không mong muốn còn "29-K1 28462.png"
     license_plate_VN = re.sub(r'[^\w\s-]', '', license_plate_VN)
 
-    # Kiểm tra xem đã tồn tại thư mục chưa, nếu ngày mới bắt đầu thì sẽ chưa có
+    # Tạo đường dẫn lưu hình ảnh: data/license_plate/14-09-24/38-F73901
+    save_dir_license_plate = os.path.join("data", "license_plate", date_today, license_plate_VN)
     os.makedirs(save_dir_license_plate, exist_ok=True)
 
     # Lưu hình ảnh vào thư mục và trả về đường dẫn
-    cv2.imwrite(os.path.join(save_dir_license_plate , license_plate_VN + today + '.png'), license_plate_crop)
-    cv2.imwrite(os.path.join(save_dir_license_plate , "background_" + today + '.png'), image_license_plate)
-    cv2.imwrite(os.path.join(save_dir_license_plate , "face" + today + '.png'), image_face)
+    cv2.imwrite(os.path.join(save_dir_license_plate , f"{license_plate_VN}_{today}.png"), license_plate_crop)
+    cv2.imwrite(os.path.join(save_dir_license_plate , f"background_{today}.png"), image_license_plate)
+    cv2.imwrite(os.path.join(save_dir_license_plate , f"face_{today}.png"), image_face)
 
-    licenseplate_path = save_dir_license_plate + "/" + "background_" + today + '.png'
-    face_path = save_dir_license_plate + "/" + "face" + today + '.png'
+    licenseplate_path = os.path.join(save_dir_license_plate, f"background_{today}.png")
+    face_path = os.path.join(save_dir_license_plate, f"face_{today}.png")
 
     return licenseplate_path, face_path

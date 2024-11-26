@@ -1,6 +1,6 @@
 import string
-import logging
 import cv2
+import time
 import shutil
 import asyncio
 import os
@@ -12,8 +12,6 @@ from fastapi import HTTPException
 from file.save_file import save_image_license_plate
 from file.check_image import check_image
 from license_plate.forrmat_license_plate import dict_int_to_char, dict_char_to_int, dict_two
-
-logger = logging.getLogger(__name__)
 
 
 # Định dạng biển số xe máy sao cho đúng với định dạng biển số xe máy của Việt Nam hiện nay
@@ -112,10 +110,14 @@ async def get_license_plate(license_plate_crop):
     """
 
     is_license_plate = False
+    start_time = time.time()
 
     # Đọc tất cả các ký tự chứa trong hình ảnh vào một luồng phụ và có chế độ bất đồng bộ
     # sử dụng cls khi văn bản có góc xoay 180 độ, nếu không có văn bản nào 180 độ thì nên đặt False để tăng hiệu suất
     result_license_plate = await asyncio.to_thread(detect_OCR, license_plate_crop)
+    # Tính thời gian đọc ký tự biển số
+    ocr_model_time = time.time()
+    # print(f"Thời gian paddleOCR đọc ký tự: {ocr_model_time - start_time}s")
     
     # Kiểm tra kết quả 
     if result_license_plate:
@@ -136,11 +138,16 @@ async def get_license_plate(license_plate_crop):
     else:
         license_plate='000000000'
 
+    # Tính thời gian định dạng các ký tự
+    format_license_plate_time = time.time()
+    # print(f"Thời gian định dạng các ký tự biển số: {format_license_plate_time - ocr_model_time}s")
+
     return  is_license_plate, license_plate # ,license_plate_crop_cvt
 
 # Dự đoán và Cắt ảnh với hình ảnh bình thường
 async def predict(image, image2, save=True):
-    
+
+    start_time = time.time()    
     is_license_plate= False   #default
     license_plate = "Không thấy biển số"   #default
     img_path = "None"    #default
@@ -149,6 +156,10 @@ async def predict(image, image2, save=True):
     # Kiểm tra xem hình ảnh gửi đến api là frame từ camera hay hình ảnh có định dạng png, jpg, ...
     image = await asyncio.to_thread(check_image, image=image)
     image2 = await asyncio.to_thread(check_image, image=image2)
+
+    # Tính thời gian kiểm tra ảnh có hợp lệ không
+    check_image_time = time.time()
+    # print(f"Thời gian kiểm tra hình ảnh: {check_image_time - start_time}s")
 
     # Kiểm tra nếu không thể đọc được ảnh
     if image is None:
@@ -164,6 +175,10 @@ async def predict(image, image2, save=True):
     # phát hiện khu vực có biển số, max_det là số lượng đối tượng phát hiện trên mỗi hình ảnh(max 300)
     results = await asyncio.to_thread(license_plate_detect_gpu, image)
 
+    # Tính thời gian phát hiện khu vực có biển số
+    license_plate_detect_time = time.time()
+    # print(f"Thời gian yolo nhận diện biển số: {license_plate_detect_time - check_image_time}s")
+
     if results:
         # Trích xuất vị trí bounding box, là vị trí tọa độ chứa biển số
         boxes = results.boxes.xyxy.tolist()
@@ -178,6 +193,10 @@ async def predict(image, image2, save=True):
             # Đọc các ký tự từ biển số với hàm async
             is_license_plate, license_plate = await get_license_plate(license_plate_crop)
 
+            # Tính thời gian đọc các kí tự trong biển số
+            ocr_license_plate_time = time.time()
+            # print(f"Thời gian đọc các ký tự biển số: {ocr_license_plate_time - license_plate_detect_time}s")
+
             #lưu hình ảnh biển số vào thư mục
             if save:
                 license_plate_path, face_path = await asyncio.to_thread(
@@ -188,6 +207,10 @@ async def predict(image, image2, save=True):
                     image_face=image2
                 )
             
+            # Tính thời gian lưu hình ảnh vào ổ đĩa
+            save_image_to_disk_time = time.time()
+            # print(f"Thời gian lưu hình ảnh là: {save_image_to_disk_time - license_plate_detect_time}s")
+
             # Sau khi xử lý xong hình ảnh, giải phóng bộ nhớ của hình ảnh
             del license_plate_crop
             del image

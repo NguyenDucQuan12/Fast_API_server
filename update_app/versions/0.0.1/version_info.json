@@ -1,0 +1,6 @@
+{
+    "latest_version": "0.0.1",
+    "download_url": "http://192.168.0.100:8000/update/download/0.0.1",
+    "release_notes": "Thêm 1 cảm biến, đèn",
+    "checksum": "5243d76be9e02f445fde79b3e134584ded9954547321ab9bac5ea627c76f24bd"
+}

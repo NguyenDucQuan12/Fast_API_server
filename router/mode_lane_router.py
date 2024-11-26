@@ -26,8 +26,6 @@ def create_new_mode(request: ModeBase, db: Session = Depends(get_db)): # avatar:
 # Biến lưu giá trị mode
 mode_data = {"mode": "in"}
 
-
-
 # API GET để lấy mode hiện tại
 @router.get("/getmode", response_model= ModeDisplay)
 async def get_mode(db: Session = Depends(get_db)):
